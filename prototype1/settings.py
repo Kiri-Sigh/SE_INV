@@ -97,13 +97,6 @@ LOGIN_REDIRECT_URL = '/'
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
 SOCIAL_AUTH_JSONFIELD_CUSTOM = 'django.db.models.JSONField'
 
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'dmlbtzzfx',  
-    'API_KEY': '855239969956629',        
-    'API_SECRET': 'LUxp_bytBTCajWA7z7EKZR7hTIg', 
-}
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '755244933245-sruqonspfcnoj91qol407tqds1ikcthj.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
     'openid',  # Basic authentication
