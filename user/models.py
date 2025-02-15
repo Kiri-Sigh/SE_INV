@@ -39,7 +39,7 @@ class CustomUser(AbstractUser):
     enrolled_year = models.IntegerField(default=2024)
     enrolled_department = models.CharField(max_length=100,blank=True,default="")
     merit = models.IntegerField(default=0)
-    level = models.IntegerField()
+    level = models.IntegerField(default=0)
     google_id = models.CharField(max_length=100, blank=True, null=True)  
     profile_picture = models.URLField(blank=True, null=True)  
 

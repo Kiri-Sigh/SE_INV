@@ -28,6 +28,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+SITE_ID = 1
 
 # Application definition
 
@@ -45,6 +46,7 @@ INSTALLED_APPS = [
     'cloudinary',
     'cloudinary_storage',
     'social_django',
+    'prototype1',
     'main',
     'api',
     'inventory',
@@ -81,7 +83,7 @@ REST_FRAMEWORK = {
 
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-SOCIAL_AUTH_STORAGE = 'social_django_mongoengine.models.DjangoStorage'
+#SOCIAL_AUTH_STORAGE = 'social_django_mongoengine.models.DjangoStorage'
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
 
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
@@ -120,8 +122,8 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.user.get_username",
     "social_core.pipeline.social_auth.associate_by_email",  # Optional: Match by email
     "social_core.pipeline.user.create_user",
-    'your_app.pipeline.save_google_profile',
-    "your_app.pipeline.set_student_defaults",
+    'user.pipeline.save_google_profile',
+    "user.pipeline.set_student_defaults",
     "social_core.pipeline.social_auth.associate_user",
     "social_core.pipeline.social_auth.load_extra_data",
     "social_core.pipeline.user.user_details",
