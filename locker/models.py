@@ -81,20 +81,20 @@ class LockerInteractionLog(models.Model):
     itemInOneLocker = models.ForeignKey(ItemInOneLocker, on_delete=models.SET_NULL,null=True,blank=True, related_name="locker_log_Item_in_one_lockers")
 
     def save(self, *args, **kwargs):
-        if self.student and self.admin:
-            raise ValueError("Only a student OR an admin can be assigned, not both.")
-        if self.student:
-            self.name = self.student.name  
-            self.gmail = self.student.gmail  
+        # if self.student and self.admin:
+        #     raise ValueError("Only a student OR an admin can be assigned, not both.")
+        # if self.student:
+        #     self.name = self.student.name  
+        #     self.gmail = self.student.gmail  
 
-        elif self.admin:
-            self.name = self.admin.name 
-            self.gmail = self.admin.gmail  
+        # elif self.admin:
+        #     self.name = self.admin.name 
+        #     self.gmail = self.admin.gmail  
  
-        else:
-            self.name = "Unknown"
-            self.gmail = "Unknown" 
-        self.str_log=f"{"log_id: "+self.locker_log_id+", name: "+self.name+", email: "+self.email+", possible date-time use of locker"+self.start_date_pos+" - "+self.end_date_pos+", use locker date-time: "+self.date_time_interaction+", operation done: "+self.operation}"
+        # else:
+        #     self.name = "Unknown"
+        #     self.gmail = "Unknown" 
+        # self.str_log=f"{"log_id: "+self.locker_log_id+", name: "+self.name+", email: "+self.email+", possible date-time use of locker"+self.start_date_pos+" - "+self.end_date_pos+", use locker date-time: "+self.date_time_interaction+", operation done: "+self.operation}"
         
         super().save(*args, **kwargs)
     def __str__(self):

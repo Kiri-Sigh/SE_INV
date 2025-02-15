@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 
 from pathlib import Path
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -53,6 +56,7 @@ INSTALLED_APPS = [
     'locker',
     'log',
     'session',
+    'notification',
     'user',
 ]
 
@@ -104,6 +108,11 @@ CLOUDINARY_STORAGE = {
     'API_KEY': '855239969956629',        
     'API_SECRET': 'LUxp_bytBTCajWA7z7EKZR7hTIg', 
 }
+cloudinary.config(
+    cloud_name=CLOUDINARY_STORAGE['CLOUD_NAME'],
+    api_key=CLOUDINARY_STORAGE['API_KEY'],
+    api_secret=CLOUDINARY_STORAGE['API_SECRET']
+)
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '755244933245-sruqonspfcnoj91qol407tqds1ikcthj.apps.googleusercontent.com'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
 
