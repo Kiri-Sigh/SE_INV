@@ -102,6 +102,7 @@ LOGOUT_URL = 'logout'
 LOGIN_REDIRECT_URL = '/'
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
 SOCIAL_AUTH_JSONFIELD_CUSTOM = 'django.db.models.JSONField'
+SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = "http://127.0.0.1:8000/auth/complete/google-oauth2/"  # Change for production
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': 'dmlbtzzfx',  
@@ -131,7 +132,7 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.user.get_username",
     "social_core.pipeline.social_auth.associate_by_email",  # Optional: Match by email
     "social_core.pipeline.user.create_user",
-    'user.pipeline.save_google_profile',
+    #'user.pipeline.save_google_profile',
     "user.pipeline.set_student_defaults",
     "social_core.pipeline.social_auth.associate_user",
     "social_core.pipeline.social_auth.load_extra_data",
