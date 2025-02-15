@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,13 +38,20 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'rest_framework',
     'rest_framework.authtoken',
     'debug_toolbar',
     'cloudinary',
     'cloudinary_storage',
+    'social_django',
     'main',
     'api',
+    'inventory',
+    'locker',
+    'log',
+    'session',
+    'user',
 ]
 
 MIDDLEWARE = [
@@ -54,6 +62,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'prototype1.urls'
@@ -71,6 +81,53 @@ REST_FRAMEWORK = {
 
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+SOCIAL_AUTH_STORAGE = 'social_django_mongoengine.models.DjangoStorage'
+SOCIAL_AUTH_JSONFIELD_ENABLED = True
+
+SOCIAL_AUTH_URL_NAMESPACE = 'social'
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
+SOCIAL_AUTH_REQUIRE_POST = True
+
+LOGIN_URL = 'login'
+LOGOUT_URL = 'logout'
+LOGIN_REDIRECT_URL = '/'
+SOCIAL_AUTH_JSONFIELD_ENABLED = True
+SOCIAL_AUTH_JSONFIELD_CUSTOM = 'django.db.models.JSONField'
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dmlbtzzfx',  
+    'API_KEY': '855239969956629',        
+    'API_SECRET': 'LUxp_bytBTCajWA7z7EKZR7hTIg', 
+}
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '755244933245-sruqonspfcnoj91qol407tqds1ikcthj.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+    'openid',  # Basic authentication
+    'profile',  # Access to profile information
+    'email',  # Access to email address
+    'https://www.googleapis.com/auth/userinfo.profile',  # Access to user profile info
+    'https://www.googleapis.com/auth/user.organization.read'  # Access to organization info
+]
+SOCIAL_AUTH_PIPELINE = (
+    "social_core.pipeline.social_auth.social_details",
+    "social_core.pipeline.social_auth.social_uid",
+    "social_core.pipeline.social_auth.auth_allowed",
+    "social_core.pipeline.social_auth.social_user",
+    "social_core.pipeline.user.get_username",
+    "social_core.pipeline.social_auth.associate_by_email",  # Optional: Match by email
+    "social_core.pipeline.user.create_user",
+    'your_app.pipeline.save_google_profile',
+    "your_app.pipeline.set_student_defaults",
+    "social_core.pipeline.social_auth.associate_user",
+    "social_core.pipeline.social_auth.load_extra_data",
+    "social_core.pipeline.user.user_details",
+)
+
+AUTH_USER_MODEL = 'user.CustomUser'
 
 TEMPLATES = [
     {
@@ -80,9 +137,13 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
+                'django.template.context_processors.request', 
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                
             ],
         },
     },

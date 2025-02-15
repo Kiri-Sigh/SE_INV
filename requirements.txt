@@ -5,3 +5,5 @@ django-debug-toolbar
 django-cloudinary-storage
 cloudinary
 uuid
+social-auth-app-django
+social-auth-app-django-mongoengine

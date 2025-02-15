@@ -1,0 +1,4 @@
+<form method="POST" action="{% url 'social:begin' 'google-oauth2' %}">
+  {% csrf_token %}
+  <button type="submit">Login with Google+</button>
+</form>

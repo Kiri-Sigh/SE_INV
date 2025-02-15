@@ -1,0 +1,28 @@
+use 'social_django.context_processors.login_redirect', for template settings
+
+
+
+
+steps into creating syste:
+parts:
+physical locker/qr code 
+django 
+
+django -
+database model
+
+serialization
+api 
+OAUTH2 google  
+booking system + calendar package
+
+managing Users
+super Users
+admin 
+normal student Users
+
+
+python manage.py makemigrations social_django
+python manage.py migrate social_django
+
+DB MODEL DONE TILL LockerInteractionLog but the save fn not analyzed
