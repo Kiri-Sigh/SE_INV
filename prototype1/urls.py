@@ -44,4 +44,5 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path("social-profile/", social_profile, name="social_profile"),
     path('login/', login_view, name='login'),
+    path('social/', include('user.urls')),  # Include your app’s URLs
 ]

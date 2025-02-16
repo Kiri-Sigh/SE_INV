@@ -114,30 +114,35 @@ cloudinary.config(
     api_key=CLOUDINARY_STORAGE['API_KEY'],
     api_secret=CLOUDINARY_STORAGE['API_SECRET']
 )
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '755244933245-sruqonspfcnoj91qol407tqds1ikcthj.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '112464825553-eb2pa2no6imar69ssprcnmru641p4hij.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
     'openid',  # Basic authentication
     'profile',  # Access to profile information
     'email',  # Access to email address
     'https://www.googleapis.com/auth/userinfo.profile',  # Access to user profile info
-    'https://www.googleapis.com/auth/user.organization.read'  # Access to organization info
+    'https://www.googleapis.com/auth/user.organization.read',  # Access to organization info
+    #'https://www.googleapis.com/auth/user.birthday.read',
 ]
 SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.social_auth.social_details",
     "social_core.pipeline.social_auth.social_uid",
-    "social_core.pipeline.social_auth.auth_allowed",
     "social_core.pipeline.social_auth.social_user",
+    #"social_core.pipeline.social_auth.associate_by_email",  # Optional: Match by email
+    "social_core.pipeline.social_auth.auth_allowed",
     "social_core.pipeline.user.get_username",
-    "social_core.pipeline.social_auth.associate_by_email",  # Optional: Match by email
     "social_core.pipeline.user.create_user",
-    #'user.pipeline.save_google_profile',
+    "user.pipeline.allow_reassociation",
+    "user.pipeline.auto_login_existing_user",
+    'user.pipeline.save_google_profile',
     "user.pipeline.set_student_defaults",
     "social_core.pipeline.social_auth.associate_user",
     "social_core.pipeline.social_auth.load_extra_data",
     "social_core.pipeline.user.user_details",
 )
+SOCIAL_AUTH_RAISE_EXCEPTIONS = False
+SOCIAL_AUTH_LOGIN_ERROR_URL = "/login/"  # Redirect to login page
 
 AUTH_USER_MODEL = 'user.CustomUser'
 

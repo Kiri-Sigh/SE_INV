@@ -1,7 +1,7 @@
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from user.views import social_profile
-from .views import google_login
+from .views import get_google_user_data
 
 # urlpatterns = [
 #     #login URL = http://127.0.0.1:8000/auth/login/google-oauth2/
@@ -14,3 +14,9 @@ from .views import google_login
 #     #path('login/google/', google_login, name='google_login'),
 
 # ]
+
+urlpatterns = [
+    #path('profile/', auth_views.ProfileView.as_view(), name="profile"),
+    path('profile2/', get_google_user_data, name="profile2"),
+
+]
