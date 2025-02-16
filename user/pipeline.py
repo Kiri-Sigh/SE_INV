@@ -96,8 +96,9 @@ def print_google_response(backend, user, response, *args, **kwargs):
     This function prints the response data received from Google
     when a user logs in via Google OAuth2.
     """
-    # Check if the backend is Google OAuth2
-    if backend.name == 'google':
-        # Print the response data
-        print("Google response data:", response)
+    if backend.name == 'google-oauth2':  # Ensure it's Google OAuth2
+        print("========== GOOGLE ACCOUNT DATA ==========")
+        print(response)  # Print full response from Google
+        print("=========================================")
+
     return None
