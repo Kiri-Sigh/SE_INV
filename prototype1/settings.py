@@ -70,8 +70,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-]
 
+]
+CSRF_TRUSTED_ORIGINS = [
+    #"https://yourwebsite.com",
+    "http://localhost:8000"
+]
 ROOT_URLCONF = 'prototype1.urls'
 
 REST_FRAMEWORK = {
@@ -133,6 +137,7 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.social_auth.auth_allowed",
     "social_core.pipeline.user.get_username",
     "social_core.pipeline.user.create_user",
+    'user.pipeline.print_google_response',
     "user.pipeline.allow_reassociation",
     "user.pipeline.auto_login_existing_user",
     'user.pipeline.save_google_profile',
@@ -141,7 +146,7 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.social_auth.load_extra_data",
     "social_core.pipeline.user.user_details",
 )
-SOCIAL_AUTH_RAISE_EXCEPTIONS = False
+SOCIAL_AUTH_RAISE_EXCEPTIONS = True
 SOCIAL_AUTH_LOGIN_ERROR_URL = "/login/"  # Redirect to login page
 
 AUTH_USER_MODEL = 'user.CustomUser'

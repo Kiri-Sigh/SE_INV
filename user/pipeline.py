@@ -23,7 +23,7 @@ def set_student_defaults(strategy, details, backend, user=None, *args, **kwargs)
 #             user.save()
 
 # user/pipeline.py
-from .models import CustomUser
+
 
 def save_google_profile(backend, user, response, *args, **kwargs):
     if backend.name == 'google':
@@ -47,8 +47,7 @@ User = get_user_model()
 
 def allow_reassociation(backend, user, *args, **kwargs):
     from social_core.exceptions import AuthAlreadyAssociated
-    from social_django.models import UserSocialAuth
-    from django.contrib.auth import get_user_model
+    
     
     if not user:
         email = kwargs.get('details', {}).get('email')
@@ -88,3 +87,17 @@ def auto_login_existing_user(backend, uid, user=None, response=None, *args, **kw
             pass
 
     return None  # Continue with default pipeline (creating new user if necessary)
+
+
+from social_core.exceptions import AuthException
+
+def print_google_response(backend, user, response, *args, **kwargs):
+    """
+    This function prints the response data received from Google
+    when a user logs in via Google OAuth2.
+    """
+    # Check if the backend is Google OAuth2
+    if backend.name == 'google':
+        # Print the response data
+        print("Google response data:", response)
+    return None
