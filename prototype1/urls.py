@@ -19,9 +19,11 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from user.views import social_profile
 from prototype1.views import login_view
-    
+from prototype1.views import home_view
+from qr_app.views import generate_qr
 
 urlpatterns = [
+    path('', home_view, name='home'),
     path('admin/', admin.site.urls),
         #login URL = http://127.0.0.1:8000/auth/login/google-oauth2/
     #after login visit = http://127.0.0.1:8000/social-profile/
@@ -31,7 +33,7 @@ urlpatterns = [
     #test when login get gmail user data
     path("social-profile/", social_profile, name="social_profile"),
     path('login/', login_view, name='login'),
-
+    path('qr-request/', generate_qr, name='qr-request'),
 
 ]
 
