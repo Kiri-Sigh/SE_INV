@@ -15,6 +15,11 @@ from pathlib import Path
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
+from datetime import timedelta
+
+
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -49,6 +54,7 @@ INSTALLED_APPS = [
     'cloudinary',
     'cloudinary_storage',
     'social_django',
+    'rest_framework_simplejwt',
     'prototype1',
     'main',
     'api',
@@ -70,6 +76,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'prototype1.middleware.AutoLoginMiddleware',
+
 
 ]
 CSRF_TRUSTED_ORIGINS = [
@@ -85,10 +93,24 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
-    ]
+        'rest_framework.permissions.IsAuthenticated',  # Only allow authenticated users to access certain views
+
+    ], 
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
 }
 
 
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),    
+    'ROTATE_REFRESH_TOKENS': False,  # Get a new refresh token every time
+    'BLACKLIST_AFTER_ROTATION': True,  # If True, blacklist the old refresh token after using it
+    
+    'USER_ID_FIELD': 'user_id', 
+    
+}
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 #SOCIAL_AUTH_STORAGE = 'social_django_mongoengine.models.DjangoStorage'
@@ -103,7 +125,7 @@ SOCIAL_AUTH_REQUIRE_POST = True
 
 LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/api/token'
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
 SOCIAL_AUTH_JSONFIELD_CUSTOM = 'django.db.models.JSONField'
 SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = "http://127.0.0.1:8000/auth/complete/google-oauth2/"  # Change for production
@@ -137,11 +159,12 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.social_auth.auth_allowed",
     "social_core.pipeline.user.get_username",
     "social_core.pipeline.user.create_user",
-    'user.pipeline.print_google_response',
-    "user.pipeline.allow_reassociation",
-    "user.pipeline.auto_login_existing_user",
+    #'user.pipeline.print_google_response',
+    #"user.pipeline.allow_reassociation",
+    #"user.pipeline.auto_login_existing_user",
     'user.pipeline.save_google_profile',
-    "user.pipeline.set_student_defaults",
+    'user.pipeline.save_google_session',
+    #"user.pipeline.set_student_defaults",
     "social_core.pipeline.social_auth.associate_user",
     "social_core.pipeline.social_auth.load_extra_data",
     "social_core.pipeline.user.user_details",
