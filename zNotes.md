@@ -10,7 +10,6 @@ database model
 
 serialization
 api
-OAUTH2 google  
 booking system + calendar package
 
 managing Users

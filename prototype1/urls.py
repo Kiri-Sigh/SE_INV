@@ -19,7 +19,7 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from user.views import social_profile
 from prototype1.views import login_view#google_login
-
+from api.views import custom_logout
 
 # urlpatterns = [
 #     path('admin/', admin.site.urls),
@@ -41,7 +41,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # Ensure this line is present for social authentication
     path('auth/', include('social_django.urls', namespace='social')),
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    #path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path("social-profile/", social_profile, name="social_profile"),
     path('login/', login_view, name='login'),
     path('social/', include('user.urls')),  # Include your app’s URLs

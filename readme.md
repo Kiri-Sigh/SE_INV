@@ -1,3 +1,5 @@
+now can auth - put @permission_classes([IsAuthenticated]) above view it will check permission in backend
+
 how to check cheap availability -
 check each date
 
