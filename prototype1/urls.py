@@ -22,6 +22,7 @@ from prototype1.views import home_view
 from qr_app.views import generate_qr
 from prototype1.views import login_view#google_login
 from api.views import custom_logout
+from inventory.views import list_items, item_detail
 
 # urlpatterns = [
 #     path('admin/', admin.site.urls),
@@ -48,5 +49,6 @@ urlpatterns = [
     path('qr-request/', generate_qr, name='qr-request'),
     path('social/', include('user.urls')),  # Include your app’s URLs
     path('api/', include('api.urls')),  # Include the auth API URLs
-
+    path('items/', list_items, name='list_items'),
+    path('items/<uuid:item_id>/', item_detail, name='item_detail'),
 ]
