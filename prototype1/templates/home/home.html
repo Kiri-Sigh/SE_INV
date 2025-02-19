@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>what the sigma</title>
+    <style>
+        body {
+            background-color: #000000;
+        }
+    </style>
+</head>
+<body>
+    <div style="display: flex; flex-direction: column; width: 100%; justify-content: center; align-items: center;">
+        <img src="https://media1.tenor.com/m/jUMex_rdqPwAAAAd/among-us-twerk.gif" style="width: 100px; height: 100px;">
+        <a href="{% url 'admin:index' %}">
+            <button style="margin-bottom: 20px; background-color: skyblue;">Admin Page</button>
+        </a>
+        <a href="{% url 'login' %}">
+            <button style="margin-bottom: 20px; background-color: skyblue;">Login Page</button>
+        </a>
+        <a href="{% url 'qr-request' %}">
+            <button style="margin-bottom: 20px; background-color: skyblue;">QR Request Page</button>
+        </a>
+    </div>
+</body>
+</html>
