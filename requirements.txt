@@ -7,3 +7,4 @@ cloudinary
 uuid
 social-auth-app-django
 social-auth-app-django-mongoengine
+djangorestframework-simplejwt

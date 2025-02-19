@@ -11,3 +11,19 @@ def social_profile(request):
     google_data = get_google_profile(user)  # Get Google OAuth data
 
     return render(request, "users/social_profile.html", {"google_data": google_data})
+# from django.shortcuts import redirect
+# from social_django.utils import load_strategy
+
+# def google_login(request):
+#     strategy = load_strategy(request)
+#     redirect_uri = strategy.setting("SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI")
+#     print(f"Redirect URI being used: {redirect_uri}")  # Debugging
+#     return redirect("social:begin", backend="google-oauth2")
+from django.shortcuts import render
+from .utils import get_google_user_data  # Import the function
+
+def profile_view(request):
+    if request.user.is_authenticated:
+        google_data = get_google_user_data(request.user)
+        return render(request, "profile.html", {"google_data": google_data})
+    return render(request, "login.html")
