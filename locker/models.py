@@ -36,21 +36,21 @@ class Locker(models.Model):
     # cheap_session = models.ForeignKey(CheapItemSessionData, on_delete=models.SET_NULL,null=True,blank=True, related_name="student_users")
     # expensive_session = models.ForeignKey(ExpensiveItemSessionData, on_delete=models.SET_NULL,null=True,blank=True, related_name="admin_users")
 
-    def save(self, *args, **kwargs):
-        if self.student and self.admin:
-            raise ValueError("Only a cheap OR an admin can be assigned, not both.")
-        if self.student:
-            self.name = self.student.name  
-            self.gmail = self.student.gmail  
+    # def save(self, *args, **kwargs):
+    #     if self.student and self.admin:
+    #         raise ValueError("Only a cheap OR an admin can be assigned, not both.")
+    #     if self.student:
+    #         self.name = self.student.name  
+    #         self.gmail = self.student.gmail  
 
-        elif self.admin:
-            self.name = self.admin.name 
-            self.gmail = self.admin.gmail  
+    #     elif self.admin:
+    #         self.name = self.admin.name 
+    #         self.gmail = self.admin.gmail  
  
-        else:
-            self.name = "Unknown"
-            self.gmail = "Unknown" 
-        super().save(*args, **kwargs)
+    #     else:
+    #         self.name = "Unknown"
+    #         self.gmail = "Unknown" 
+    #     super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

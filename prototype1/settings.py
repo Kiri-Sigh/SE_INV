@@ -202,13 +202,17 @@ WSGI_APPLICATION = 'prototype1.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# Check if we're running in Docker (deployment)
+IN_DOCKER = os.environ.get('IN_DOCKER', False)
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.environ.get('POSTGRES_DB', 'se-locker'),
         'USER': os.environ.get('POSTGRES_USER', 'postgres'),
         'PASSWORD': os.environ.get('POSTGRES_PASSWORD', '1212312121'),
-        'HOST': os.environ.get('POSTGRES_HOST', 'db'),
+        # Use 'db' in Docker, otherwise use localhost
+        'HOST': 'db' if IN_DOCKER else 'localhost',
         'PORT': os.environ.get('POSTGRES_PORT', '5432'),
     }
 }

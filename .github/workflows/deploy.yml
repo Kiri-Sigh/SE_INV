@@ -128,6 +128,7 @@ jobs:
                           echo "            - PYTHONPATH=/app" >> docker-compose.prod.yml
                           echo "            - PYTHONUNBUFFERED=1" >> docker-compose.prod.yml
                           echo "            - STATIC_URL=/static/" >> docker-compose.prod.yml
+                          echo "            - IN_DOCKER=true" >> docker-compose.prod.yml
                           echo "        volumes:" >> docker-compose.prod.yml
                           echo "            - ./static:/app/static" >> docker-compose.prod.yml
                           echo "            - ./staticfiles:/app/staticfiles" >> docker-compose.prod.yml

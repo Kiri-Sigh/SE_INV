@@ -47,8 +47,10 @@ urlpatterns = [
     path("social-profile/", social_profile, name="social_profile"),
     path('login/', login_view, name='login'),
     path('qr-request/', generate_qr, name='qr-request'),
-    path('social/', include('user.urls')),  # Include your app’s URLs
+    path('social/', include('user.urls')),  # Include your app's URLs
     path('api/', include('api.urls')),  # Include the auth API URLs
+    path('inventory/', include('inventory.urls')),  # Include inventory URLs
     path('items/', list_items, name='list_items'),
     path('items/<uuid:item_id>/', item_detail, name='item_detail'),
+    path('qr/', include('qr_app.urls')),  # Include QR app URLs
 ]

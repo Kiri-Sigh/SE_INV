@@ -1,3 +1,8 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
 # Python
 __pycache__/
 *.py[cod]
@@ -56,6 +61,25 @@ venv.bak/
 *.swo
 *~
 
+# Docker
+Dockerfile
+docker-compose*.yml
+.docker/
+
+# Documentation
+README.md
+docs/
+*.rst
+*.md
+
+# Test
+.coverage
+htmlcov/
+.tox/
+.pytest_cache/
+pytest.ini
+test*.py
+
 # Misc
 .DS_Store
 Thumbs.db
@@ -69,22 +93,8 @@ log.txt
 *.qr
 node_modules/
 
-# Database
-*.sqlite3
-*.db
-*.sql
-
-# Test coverage
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-cover/ 
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+.circleci/ 

@@ -6,7 +6,7 @@ class ComponentCategory(models.Model):
     category_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     category = models.CharField(max_length=100,null=False,blank=False)
     def __str__(self):
-        return self.name
+        return self.category
     
 class CheapItem(models.Model):
     component_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
