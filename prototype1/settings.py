@@ -64,7 +64,8 @@ INSTALLED_APPS = [
     'session',
     'notification',
     'user',
-    'qr_app'
+    'qr_app',
+    'whitenoise.runserver_nostatic'
 ]
 
 MIDDLEWARE = [
@@ -78,8 +79,7 @@ MIDDLEWARE = [
     'social_django.middleware.SocialAuthExceptionMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'prototype1.middleware.AutoLoginMiddleware',
-
-
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 CSRF_TRUSTED_ORIGINS = [
     #"https://yourwebsite.com",
@@ -204,7 +204,7 @@ WSGI_APPLICATION = 'prototype1.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'test3',   # Replace with your PostgreSQL database name
+        'NAME': 'se-locker',   # Replace with your PostgreSQL database name
         'USER': 'postgres',   # Replace with your PostgreSQL username
         'PASSWORD': '1212312121',  # Replace with your PostgreSQL password  
         'HOST': 'localhost',  # Use '127.0.0.1' if localhost doesn’t work
@@ -247,7 +247,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+    web:
+        image: ghcr.io/pongchanan/se-locker
+        restart: always
+        ports:
+            - '8010:8000'
+        environment:
+            - DEBUG=0
+            - DJANGO_SETTINGS_MODULE=prototype1.settings
+            - ALLOWED_HOSTS=oplor.me,www.oplor.me,152.42.220.156,localhost,127.0.0.1
+            - SECRET_KEY=1212312121
+        depends_on:
+            - db
+        command: sh -c "python manage.py collectstatic --noinput && gunicorn prototype1.wsgi:application --bind 0.0.0.0:800>
+
+    db:
+        image: postgres:14
+        restart: always
+        volumes:
+            - postgres_prod_data:/var/lib/postgresql/data
+        environment:
+            - POSTGRES_DB=se-locker
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=1212312121
+
+volumes:
+    postgres_prod_data:
