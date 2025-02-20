@@ -34,3 +34,15 @@ tzdata==2025.1
 urllib3==2.3.0
 uuid==1.30
 whitenoise>=6.6.0 
+djangorestframework
+psycopg2
+django-debug-toolbar
+django-cloudinary-storage
+cloudinary
+uuid
+social-auth-app-django
+social-auth-app-django-mongoengine
+djangorestframework-simplejwt
+pyscript
+requests
+qrcode[pil]
