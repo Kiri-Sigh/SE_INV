@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
     push:
-        branches: [idk]
+        branches: [main, master, idk]
     pull_request:
-        branches: [idk]
+        branches: [main, master, idk]
 
 permissions:
     contents: read
@@ -15,6 +15,7 @@ jobs:
         runs-on: ubuntu-latest
         env:
             REGISTRY: ghcr.io
+            IMAGE_NAME: ${{ github.repository_owner }}/se_inv
 
         steps:
             - uses: actions/checkout@v3
@@ -28,11 +29,6 @@ jobs:
               run: |
                   python -m pip install --upgrade pip
                   pip install -r requirements.txt
-
-            - name: Set lowercase image name
-              run: |
-                  repository="${{ github.repository }}"
-                  echo "IMAGE_NAME=${repository,,}" >> $GITHUB_ENV
 
             - name: Login to GitHub Container Registry
               uses: docker/login-action@v2
@@ -60,6 +56,14 @@ jobs:
                   push: true
                   tags: ${{ steps.meta.outputs.tags }}
                   labels: ${{ steps.meta.outputs.labels }}
+                  cache-from: type=gha
+                  cache-to: type=gha,mode=max
+
+            - name: Verify image exists
+              run: |
+                  echo "Verifying image exists..."
+                  docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+                  echo "Image verified successfully!"
 
             - name: Run Tests
               run: |
@@ -75,10 +79,18 @@ jobs:
               with:
                   host: ${{ secrets.SERVER_HOST }}
                   username: ${{ secrets.SERVER_USERNAME }}
+                  key: ${{ secrets.SERVER_KEY }}
                   password: ${{ secrets.SERVER_PASSWORD }}
+                  port: 22
                   script: |
-                      cd ~/locker
-                      docker compose -f docker-compose.prod.yml down
+                      echo "Starting deployment..."
+                      cd ~/locker || exit 1
+                      echo "Stopping existing containers..."
+                      docker compose -f docker-compose.prod.yml down || true
+                      echo "Removing old image..."
                       docker image rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest || true
+                      echo "Pulling new image..."
                       docker compose -f docker-compose.prod.yml pull
+                      echo "Starting new containers..."
                       docker compose -f docker-compose.prod.yml up -d
+                      echo "Deployment complete!"
