@@ -18,8 +18,11 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from user.views import social_profile
+from prototype1.views import home_view
+from qr_app.views import generate_qr
 from prototype1.views import login_view#google_login
 from api.views import custom_logout
+from inventory.views import list_items, item_detail
 
 # urlpatterns = [
 #     path('admin/', admin.site.urls),
@@ -32,19 +35,20 @@ from api.views import custom_logout
 #     path("social-profile/", social_profile, name="social_profile"),
 #     path('login/', login_view, name='login'),
 #    # path('login/google/', google_login, name='google_login'),
-
-
 # ]
 
 
 urlpatterns = [
+    path('', home_view, name='home'),
     path('admin/', admin.site.urls),
     # Ensure this line is present for social authentication
     path('auth/', include('social_django.urls', namespace='social')),
     #path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path("social-profile/", social_profile, name="social_profile"),
     path('login/', login_view, name='login'),
+    path('qr-request/', generate_qr, name='qr-request'),
     path('social/', include('user.urls')),  # Include your app’s URLs
     path('api/', include('api.urls')),  # Include the auth API URLs
-
+    path('items/', list_items, name='list_items'),
+    path('items/<uuid:item_id>/', item_detail, name='item_detail'),
 ]

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ item.name }} Details</title>
+    <style>
+        body {
+            background-color: rgb(0, 0, 0);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <a href="/items">
+        <button style="margin-bottom: 20px; background-color: skyblue;">Item List</button>
+    </a>
+    <h1>{{ item.name }}</h1>
+    <p><strong>Category:</strong> {{ item.category }}</p>
+    <p><strong>Description:</strong> {{ item.description }}</p>
+    <p><strong>Stock:</strong> {{ item.stock }}</p>
+    <p><strong>Available:</strong> {{ item.quantity_available }}</p>
+    <p><strong>Borrowed:</strong> {{ item.quantity_borrowed }}</p>
+    
+    {% if item.image %}
+        <img src="{{ item.image.url }}" alt="{{ item.name }}" width="200">
+    {% endif %}
+
+    <br><br>
+    <a href="{% url 'list_items' %}">Back to Items</a>
+</body>
+</html>
