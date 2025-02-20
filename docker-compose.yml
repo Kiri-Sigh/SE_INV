@@ -20,16 +20,17 @@ services:
         deploy:
             resources:
                 limits:
-                    memory: 512M
+                    memory: 1G
                 reservations:
-                    memory: 256M
+                    memory: 512M
         command: >
             sh -c "
-            while ! nc -z db 5432; do
-                echo 'Waiting for database...'
-                sleep 1
+            echo 'Waiting for PostgreSQL to be ready...'
+            while ! pg_isready -h db -p 5432 -U postgres; do
+                sleep 2
             done
-            python manage.py migrate &&
+            echo 'PostgreSQL is ready!'
+            python manage.py migrate
             python manage.py runserver 0.0.0.0:8000
             "
 
@@ -45,14 +46,15 @@ services:
         deploy:
             resources:
                 limits:
-                    memory: 512M
+                    memory: 1G
                 reservations:
-                    memory: 256M
+                    memory: 512M
         healthcheck:
             test: ['CMD-SHELL', 'pg_isready -U postgres']
-            interval: 5s
+            interval: 10s
             timeout: 5s
             retries: 5
+            start_period: 10s
 
 volumes:
     postgres_prod_data:
