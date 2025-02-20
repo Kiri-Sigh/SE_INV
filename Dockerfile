@@ -8,7 +8,8 @@ RUN apt-get update && \
     gcc \
     python3-dev \
     netcat-traditional \
-    postgresql-client && \
+    postgresql-client \
+    libpq-dev && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
@@ -24,7 +25,8 @@ WORKDIR /app
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     netcat-traditional \
-    postgresql-client && \
+    postgresql-client \
+    libpq-dev && \
     rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user
@@ -46,6 +48,7 @@ RUN chown -R myuser:myuser /app
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV DJANGO_SETTINGS_MODULE=prototype1.settings
+ENV PYTHONPATH=/app
 
 # Switch to non-root user
 USER myuser

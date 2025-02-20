@@ -14,6 +14,8 @@ services:
             - POSTGRES_DB=se-locker
             - POSTGRES_USER=postgres
             - POSTGRES_PASSWORD=1212312121
+            - PYTHONPATH=/app
+            - PYTHONUNBUFFERED=1
         depends_on:
             db:
                 condition: service_healthy
@@ -25,15 +27,26 @@ services:
                     memory: 512M
         command: >
             sh -c "
-            echo 'Waiting for PostgreSQL to be ready...'
-            until PGPASSWORD=1212312121 psql -h db -U postgres -c '\l'; do
+            echo '=== Starting web container ===' &&
+            echo 'Python version:' &&
+            python --version &&
+            echo 'Current working directory:' &&
+            pwd &&
+            echo 'Directory contents:' &&
+            ls -la &&
+            echo 'Checking Django installation:' &&
+            python -c 'import django; print(django.__version__)' &&
+            echo 'Waiting for PostgreSQL to be ready...' &&
+            until PGPASSWORD=1212312121 psql -h db -U postgres -c '\l' > /dev/null 2>&1; do
                 echo 'PostgreSQL is unavailable - sleeping'
                 sleep 2
-            done
-            echo 'PostgreSQL is ready!'
-            echo 'Running migrations...'
-            python manage.py migrate --noinput
-            echo 'Starting Django server...'
+            done &&
+            echo 'PostgreSQL is ready!' &&
+            echo 'Running migrations...' &&
+            python manage.py migrate --noinput --verbosity 2 &&
+            echo 'Collecting static files...' &&
+            python manage.py collectstatic --noinput &&
+            echo 'Starting Django server...' &&
             python manage.py runserver 0.0.0.0:8000
             "
 
