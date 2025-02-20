@@ -13,7 +13,7 @@ services:
             - SECRET_KEY=1212312121
         depends_on:
             - db
-        command: sh -c "python manage.py collectstatic --noinput && gunicorn prototype1.wsgi:application --bind 0.0.0.0:800>
+        command: sh -c "python manage.py collectstatic --noinput && gunicorn prototype1.wsgi:application --bind 0.0.0.0:8000"
 
     db:
         image: postgres:14

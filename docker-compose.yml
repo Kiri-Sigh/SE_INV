@@ -6,14 +6,16 @@ services:
         image: ghcr.io/pongchanan/se-locker
         restart: always
         ports:
-            - '8010:8000'
+            - '8000:8000'
         environment:
-            - DEBUG=0
+            - DEBUG=1
             - DJANGO_SETTINGS_MODULE=prototype1.settings
-            - SECRET_KEY=1212312121
+            - POSTGRES_DB=se-locker
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=1212312121
         depends_on:
             - db
-        command: gunicorn prototype1.wsgi:application --bind 0.0.0.0:8000
+        command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
 
     db:
         image: postgres:14
