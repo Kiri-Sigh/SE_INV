@@ -3,7 +3,7 @@ version: '3.8'
 services:
     web:
         build: .
-        image: ghcr.io/pongchanan/se-locker
+        image: ${REGISTRY:-ghcr.io}/${IMAGE_NAME:-pongchanan/se-inv}:${TAG:-latest}
         restart: always
         ports:
             - '8010:8000'
