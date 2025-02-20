@@ -104,6 +104,9 @@ jobs:
                       echo "Using image: $DOCKER_IMAGE"
                       cd ~/locker || exit 1
 
+                      # Create necessary directories
+                      mkdir -p static staticfiles
+
                       # Create docker-compose.prod.yml if it doesn't exist
                       if [ ! -f "docker-compose.prod.yml" ]; then
                           echo "Creating docker-compose.prod.yml..."
@@ -124,6 +127,10 @@ jobs:
                           echo "            - POSTGRES_PASSWORD=1212312121" >> docker-compose.prod.yml
                           echo "            - PYTHONPATH=/app" >> docker-compose.prod.yml
                           echo "            - PYTHONUNBUFFERED=1" >> docker-compose.prod.yml
+                          echo "            - STATIC_URL=/static/" >> docker-compose.prod.yml
+                          echo "        volumes:" >> docker-compose.prod.yml
+                          echo "            - ./static:/app/static" >> docker-compose.prod.yml
+                          echo "            - ./staticfiles:/app/staticfiles" >> docker-compose.prod.yml
                           echo "        depends_on:" >> docker-compose.prod.yml
                           echo "            db:" >> docker-compose.prod.yml
                           echo "                condition: service_healthy" >> docker-compose.prod.yml

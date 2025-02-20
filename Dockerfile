@@ -42,7 +42,10 @@ RUN pip install --no-cache /wheels/*
 
 # Copy project files
 COPY . .
-RUN chown -R myuser:myuser /app
+
+# Create necessary directories
+RUN mkdir -p /app/static /app/staticfiles && \
+    chown -R myuser:myuser /app
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -57,4 +60,4 @@ USER myuser
 EXPOSE 8000
 
 # Run migrations and start server
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["sh", "-c", "python manage.py collectstatic --noinput && python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"]
