@@ -8,6 +8,7 @@ services:
             - '8010:8000'
         environment:
             - DEBUG=0
+            - IN_DOCKER=True
             - DJANGO_SETTINGS_MODULE=prototype1.settings
             - DATABASE_URL=postgres://postgres:1212312121@db:5432/se-locker
             - POSTGRES_DB=se-locker

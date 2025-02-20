@@ -18,6 +18,7 @@ import cloudinary.api
 from datetime import timedelta
 
 import os
+import sys
 
 
 
@@ -211,9 +212,11 @@ DATABASES = {
         'NAME': os.environ.get('POSTGRES_DB', 'se-locker'),
         'USER': os.environ.get('POSTGRES_USER', 'postgres'),
         'PASSWORD': os.environ.get('POSTGRES_PASSWORD', '1212312121'),
-        # Use 'db' in Docker, otherwise use localhost
-        'HOST': 'db' if IN_DOCKER else 'localhost',
+        'HOST': os.environ.get('DB_HOST', 'db' if IN_DOCKER else 'localhost'),
         'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+        'TEST': {
+            'NAME': 'test_se_locker',  # This will create a new database for testing
+        },
     }
 }
 
