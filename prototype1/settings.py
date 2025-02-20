@@ -17,6 +17,7 @@ import cloudinary.uploader
 import cloudinary.api
 from datetime import timedelta
 
+import os
 
 
 
@@ -204,11 +205,11 @@ WSGI_APPLICATION = 'prototype1.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'se-locker',   # Replace with your PostgreSQL database name
-        'USER': 'postgres',   # Replace with your PostgreSQL username
-        'PASSWORD': '1212312121',  # Replace with your PostgreSQL password  
-        'HOST': 'localhost',  # Use '127.0.0.1' if localhost doesn’t work
-        'PORT': '5432',  # Default PostgreSQL port
+        'NAME': os.environ.get('POSTGRES_DB', 'se-locker'),
+        'USER': os.environ.get('POSTGRES_USER', 'postgres'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', '1212312121'),
+        'HOST': os.environ.get('POSTGRES_HOST', 'db'),
+        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
     }
 }
 
