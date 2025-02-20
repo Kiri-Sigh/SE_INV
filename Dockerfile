@@ -7,7 +7,8 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     gcc \
     python3-dev \
-    netcat-traditional && \
+    netcat-traditional \
+    postgresql-client && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
@@ -19,9 +20,11 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install netcat for database check
+# Install runtime dependencies
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends netcat-traditional && \
+    apt-get install -y --no-install-recommends \
+    netcat-traditional \
+    postgresql-client && \
     rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user
@@ -37,6 +40,7 @@ RUN pip install --no-cache /wheels/*
 
 # Copy project files
 COPY . .
+RUN chown -R myuser:myuser /app
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
