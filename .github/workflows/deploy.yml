@@ -9,8 +9,6 @@ on:
 permissions:
     contents: read
     packages: write
-    packages-pull: true
-    packages-push: true
 
 jobs:
     test-and-deploy:
@@ -98,14 +96,58 @@ jobs:
               with:
                   host: ${{ secrets.SERVER_HOST }}
                   username: ${{ secrets.SERVER_USERNAME }}
-                  key: ${{ secrets.SERVER_KEY }}
                   password: ${{ secrets.SERVER_PASSWORD }}
                   port: 22
-                  envs: DOCKER_IMAGE
+                  envs: DOCKER_IMAGE,REGISTRY,IMAGE_NAME
                   script: |
                       echo "Starting deployment..."
                       echo "Using image: $DOCKER_IMAGE"
                       cd ~/locker || exit 1
+
+                      # Create docker-compose.prod.yml if it doesn't exist
+                      if [ ! -f "docker-compose.prod.yml" ]; then
+                          echo "Creating docker-compose.prod.yml..."
+                          echo "version: '3.8'" > docker-compose.prod.yml
+                          echo "" >> docker-compose.prod.yml
+                          echo "services:" >> docker-compose.prod.yml
+                          echo "    web:" >> docker-compose.prod.yml
+                          echo "        image: \${REGISTRY}/\${IMAGE_NAME}:\${TAG:-latest}" >> docker-compose.prod.yml
+                          echo "        restart: always" >> docker-compose.prod.yml
+                          echo "        ports:" >> docker-compose.prod.yml
+                          echo "            - '8010:8000'" >> docker-compose.prod.yml
+                          echo "        environment:" >> docker-compose.prod.yml
+                          echo "            - DEBUG=0" >> docker-compose.prod.yml
+                          echo "            - DJANGO_SETTINGS_MODULE=prototype1.settings" >> docker-compose.prod.yml
+                          echo "            - DATABASE_URL=postgres://postgres:1212312121@db:5432/se-locker" >> docker-compose.prod.yml
+                          echo "            - POSTGRES_DB=se-locker" >> docker-compose.prod.yml
+                          echo "            - POSTGRES_USER=postgres" >> docker-compose.prod.yml
+                          echo "            - POSTGRES_PASSWORD=1212312121" >> docker-compose.prod.yml
+                          echo "            - PYTHONPATH=/app" >> docker-compose.prod.yml
+                          echo "            - PYTHONUNBUFFERED=1" >> docker-compose.prod.yml
+                          echo "        depends_on:" >> docker-compose.prod.yml
+                          echo "            db:" >> docker-compose.prod.yml
+                          echo "                condition: service_healthy" >> docker-compose.prod.yml
+                          echo "" >> docker-compose.prod.yml
+                          echo "    db:" >> docker-compose.prod.yml
+                          echo "        image: postgres:14" >> docker-compose.prod.yml
+                          echo "        restart: always" >> docker-compose.prod.yml
+                          echo "        volumes:" >> docker-compose.prod.yml
+                          echo "            - postgres_prod_data:/var/lib/postgresql/data" >> docker-compose.prod.yml
+                          echo "        environment:" >> docker-compose.prod.yml
+                          echo "            - POSTGRES_DB=se-locker" >> docker-compose.prod.yml
+                          echo "            - POSTGRES_USER=postgres" >> docker-compose.prod.yml
+                          echo "            - POSTGRES_PASSWORD=1212312121" >> docker-compose.prod.yml
+                          echo "        healthcheck:" >> docker-compose.prod.yml
+                          echo "            test: [\"CMD-SHELL\", \"pg_isready -U postgres\"]" >> docker-compose.prod.yml
+                          echo "            interval: 10s" >> docker-compose.prod.yml
+                          echo "            timeout: 5s" >> docker-compose.prod.yml
+                          echo "            retries: 5" >> docker-compose.prod.yml
+                          echo "            start_period: 10s" >> docker-compose.prod.yml
+                          echo "" >> docker-compose.prod.yml
+                          echo "volumes:" >> docker-compose.prod.yml
+                          echo "    postgres_prod_data:" >> docker-compose.prod.yml
+                      fi
+
                       echo "Stopping existing containers..."
                       docker compose -f docker-compose.prod.yml down || true
                       echo "Removing old image..."
@@ -115,5 +157,8 @@ jobs:
                       echo "Pulling new image..."
                       docker pull $DOCKER_IMAGE
                       echo "Starting new containers..."
-                      REGISTRY=${{ env.REGISTRY }} IMAGE_NAME=${{ env.IMAGE_NAME }} TAG=latest docker compose -f docker-compose.prod.yml up -d
+                      export REGISTRY=${{ env.REGISTRY }}
+                      export IMAGE_NAME=${{ env.IMAGE_NAME }}
+                      export TAG=latest
+                      docker compose -f docker-compose.prod.yml up -d
                       echo "Deployment complete!"
