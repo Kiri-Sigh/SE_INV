@@ -186,9 +186,9 @@ def auto_login_existing_user(backend, uid, user=None, response=None, *args, **kw
 from social_core.exceptions import AuthException
 
 def print_google_response(backend, user,strategy, response,uid,details, *args, **kwargs):
-
+   # print("jwtauth",JWTAuthentication())
     print("Current strategy:", strategy)
-    
+    print("request",request)
     print("backend",backend)
     print("Current user:", user)
     print("Current details:", details)

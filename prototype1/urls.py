@@ -51,4 +51,8 @@ urlpatterns = [
     path('api/', include('api.urls')),  # Include the auth API URLs
     path('items/', list_items, name='list_items'),
     path('items/<uuid:item_id>/', item_detail, name='item_detail'),
+    # path('auth/google/login/', exchange_google_token, name="google_login"),
+    # path('auth/refresh/', custom_refresh_token, name="token_refresh"),
+    # path('auth/protected/', protected_endpoint, name="protected_endpoint"),
+    path('auth/logout/', custom_logout, name="logout"),
 ]

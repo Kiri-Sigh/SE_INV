@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
 from rest_framework_simplejwt.tokens import RefreshToken
 from social_django.utils import psa
 from django.http import JsonResponse
@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from rest_framework import status
 from django.contrib.auth import logout
 from django.shortcuts import redirect
+from rest_framework.permissions import IsAuthenticated
 
 @api_view(['POST'])
 @psa('social:complete')
@@ -42,6 +43,7 @@ def set_jwt_cookie(response, access_token, refresh_token=None):
 @login_required
 def issue_jwt_token(request):
     print("ran issue_jwt_token")
+    print("request.user",request.user)
     user = request.user  # The authenticated user
     refresh = RefreshToken.for_user(user)  
 
@@ -90,3 +92,41 @@ def custom_logout(request):
 
     return redirect('/') 
 
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def protected_view(request):
+    """
+    Protected endpoint that requires authentication.
+    """
+    return JsonResponse({"message": "You have accessed a protected endpoint", "user": request.user.username})
+
+
+
+
+
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+
+class TokenRefreshView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        refresh_token = request.data.get('refresh')
+
+        if not refresh_token:
+            return Response({"error": "Refresh token required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            refresh = RefreshToken(refresh_token)
+            # Generate new access token from refresh token
+            access_token = str(refresh.access_token)
+
+            return Response({
+                'access': access_token
+            })
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
