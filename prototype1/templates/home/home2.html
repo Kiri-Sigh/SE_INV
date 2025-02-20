@@ -21,11 +21,15 @@ content %}
         Admin Page
       </button>
     </a>
-    <a href="{% url 'login' %}">
+    <!-- <a href="{% url 'login' %}">
       <button style="margin-bottom: 20px; background-color: skyblue">
         Login Page
       </button>
-    </a>
+    </a> -->
+    <form method="POST" action="{% url 'social:begin' 'google-oauth2' %}">
+      {% csrf_token %}
+      <button type="submit">Login with Google+</button>
+    </form>
     <a href="{% url 'qr-request' %}">
       <button style="margin-bottom: 20px; background-color: skyblue">
         QR Request Page

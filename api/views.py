@@ -102,31 +102,3 @@ def protected_view(request):
     return JsonResponse({"message": "You have accessed a protected endpoint", "user": request.user.username})
 
 
-
-
-
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework import status
-
-class TokenRefreshView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request):
-        refresh_token = request.data.get('refresh')
-
-        if not refresh_token:
-            return Response({"error": "Refresh token required"}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            refresh = RefreshToken(refresh_token)
-            # Generate new access token from refresh token
-            access_token = str(refresh.access_token)
-
-            return Response({
-                'access': access_token
-            })
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

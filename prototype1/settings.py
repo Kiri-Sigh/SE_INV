@@ -78,7 +78,7 @@ MIDDLEWARE = [
     'social_django.middleware.SocialAuthExceptionMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'prototype1.middleware.AutoLoginMiddleware',
-    'prototype1.middleware.JWTAuthMiddleware',
+    #'prototype1.middleware.JWTAuthMiddleware',
     
 
 
