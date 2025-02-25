@@ -1,30 +1,72 @@
 from django.shortcuts import render
+from django.views import View
+from django.views.generic import DetailView
+from django.http import Http404
 from inventory.models import CheapItem, ExpensiveItem
+from django.template.response import TemplateResponse
+from django.template import loader
 
-def list_items(request):
-    query = request.GET.get('q', '')  # Get search query from request, default is empty
-    cheap_items = CheapItem.objects.all()
-    expensive_items = ExpensiveItem.objects.all()
+def handler404(request, exception=None):
+    """Custom 404 handler"""
+    template = loader.get_template('404.html')
+    return TemplateResponse(request, template, {'error_message': str(exception)}, status=404)
 
-    if query:
-        cheap_items = cheap_items.filter(name__icontains=query)
-        expensive_items = expensive_items.filter(name__icontains=query)
+class MainPage(View):
+    template_name = 'item_list.html'
 
-    context = {
-        'cheap_items': cheap_items,
-        'expensive_items': expensive_items,
-        'query': query  # Pass the query back to the template
-    }
+    def filter_items(self):
+        """Filter items based on search query"""
+        query = self.request.GET.get('q', '')
+        cheap_items = CheapItem.objects.all()
+        expensive_items = ExpensiveItem.objects.all()
 
-    return render(request, 'item_list.html', context)
+        if query:
+            cheap_items = cheap_items.filter(name__icontains=query)
+            expensive_items = expensive_items.filter(name__icontains=query)
+        
+        return cheap_items, expensive_items
 
-def item_detail(request, item_id):
-    item = None
+    def load_items(self):
+        """Load all items"""
+        cheap_items, expensive_items = self.filter_items()
+        return {
+            'cheap_items': cheap_items,
+            'expensive_items': expensive_items,
+            'query': self.request.GET.get('q', '')
+        }
 
-    # Try to find the item in CheapItem, then ExpensiveItem
-    item = CheapItem.objects.filter(component_id=item_id).first() or ExpensiveItem.objects.filter(component_id=item_id).first()
+    def get(self, request, *args, **kwargs):
+        """Handle GET request"""
+        self.request = request
+        try:
+            context = self.load_items()
+            return TemplateResponse(request, self.template_name, context)
+        except Exception as e:
+            return handler404(request, e)
+
+class DetailPage(DetailView):
+    template_name = 'item_detail.html'
+    context_object_name = 'item'
     
-    if not item:
-        return render(request, '404.html', status=404)  # Render a 404 page if the item is not found
-    
-    return render(request, 'item_detail.html', {'item': item})
+    def get_object(self, queryset=None):
+        """Get the object this view is displaying"""
+        item_id = self.kwargs.get('item_id')
+        
+        # Try to find in CheapItem first
+        try:
+            return CheapItem.objects.get(component_id=item_id)
+        except CheapItem.DoesNotExist:
+            # If not found in CheapItem, try ExpensiveItem
+            try:
+                return ExpensiveItem.objects.get(component_id=item_id)
+            except ExpensiveItem.DoesNotExist:
+                raise Http404(f"No item found with ID: {item_id}")
+
+    def get(self, request, *args, **kwargs):
+        """Handle GET request"""
+        try:
+            self.object = self.get_object()
+            context = self.get_context_data(object=self.object)
+            return TemplateResponse(request, self.template_name, context)
+        except Http404 as e:
+            return handler404(request, e)
