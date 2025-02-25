@@ -140,18 +140,22 @@ class ViewTests(TestCase):
 
     def test_item_detail_view(self):
         # Test cheap item detail
-        response = self.client.get(reverse('inventory:item_detail', args=[str(self.cheap_item.component_id)]))
+        response = self.client.get(reverse('inventory:item_detail', 
+            args=[str(self.cheap_item.component_id)]))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'item_detail.html')
         self.assertContains(response, "LED")
 
         # Test expensive item detail
-        response = self.client.get(reverse('inventory:item_detail', args=[str(self.expensive_item.component_id)]))
+        response = self.client.get(reverse('inventory:item_detail', 
+            args=[str(self.expensive_item.component_id)]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Multimeter")
 
         # Test non-existent item
-        response = self.client.get(reverse('inventory:item_detail', args=[str(uuid.uuid4())]))
+        non_existent_id = uuid.uuid4()
+        response = self.client.get(reverse('inventory:item_detail', 
+            args=[str(non_existent_id)]))
         self.assertEqual(response.status_code, 404)
 
     def test_search_functionality(self):

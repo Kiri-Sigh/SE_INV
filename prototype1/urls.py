@@ -22,35 +22,24 @@ from prototype1.views import home_view
 from qr_app.views import generate_qr
 from prototype1.views import login_view#google_login
 from api.views import custom_logout
-from inventory.views import list_items, item_detail
-
-# urlpatterns = [
-#     path('admin/', admin.site.urls),
-#         #login URL = http://127.0.0.1:8000/auth/login/google-oauth2/
-#     #after login visit = http://127.0.0.1:8000/social-profile/
-#     #logouot = http://127.0.0.1:8000/logout/
-#     path('auth/', include('social_django.urls', namespace='social')),
-#     path('logout/', auth_views.LogoutView.as_view(), name='logout'),  # Logout URL
-#     #test when login get gmail user data
-#     path("social-profile/", social_profile, name="social_profile"),
-#     path('login/', login_view, name='login'),
-#    # path('login/google/', google_login, name='google_login'),
-# ]
-
+from inventory.views import MainPage, DetailPage, handler404
 
 urlpatterns = [
+    # Already refactored to OOP
+    path('inventory/', include('inventory.urls')),
+    path('items/', MainPage.as_view(), name='list_items'),
+    path('items/<uuid:item_id>/', DetailPage.as_view(), name='item_detail'),
+    
+    # not refactored yet
     path('', home_view, name='home'),
     path('admin/', admin.site.urls),
-    # Ensure this line is present for social authentication
     path('auth/', include('social_django.urls', namespace='social')),
-    #path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path("social-profile/", social_profile, name="social_profile"),
     path('login/', login_view, name='login'),
     path('qr-request/', generate_qr, name='qr-request'),
-    path('social/', include('user.urls')),  # Include your app's URLs
-    path('api/', include('api.urls')),  # Include the auth API URLs
-    path('inventory/', include('inventory.urls')),  # Include inventory URLs
-    path('items/', list_items, name='list_items'),
-    path('items/<uuid:item_id>/', item_detail, name='item_detail'),
-    path('qr/', include('qr_app.urls')),  # Include QR app URLs
+    path('social/', include('user.urls')),
+    path('api/', include('api.urls')),
+    path('qr/', include('qr_app.urls')),
 ]
+
+handler404 = handler404  # Register custom 404 handler
