@@ -20,7 +20,7 @@ from django.contrib.auth import views as auth_views
 from user.views import social_profile
 from prototype1.views import home_view
 from qr_app.views import generate_qr
-from prototype1.views import login_view#google_login
+from prototype1.views import login_view
 from api.views import custom_logout
 from inventory.views import list_items, item_detail
 
