@@ -17,6 +17,8 @@ import cloudinary.uploader
 import cloudinary.api
 from datetime import timedelta
 
+import os
+import sys
 
 
 
@@ -34,7 +36,7 @@ SECRET_KEY = 'django-insecure-+7dv_n%_&1qiy%$e)$qvz@6p+y*v+g)j(-teu_eim%r-%=d4+n
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']  # Allow all hosts in development
 
 SITE_ID = 1
 
@@ -64,7 +66,8 @@ INSTALLED_APPS = [
     'session',
     'notification',
     'user',
-    'qr_app'
+    'qr_app',
+    'whitenoise.runserver_nostatic'
 ]
 
 MIDDLEWARE = [
@@ -80,6 +83,7 @@ MIDDLEWARE = [
     'prototype1.middleware.AutoLoginMiddleware',
     #'prototype1.middleware.JWTAuthMiddleware',
     
+
 
 
 ]
@@ -180,18 +184,19 @@ AUTH_USER_MODEL = 'user.CustomUser'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'prototype1/templates'),
+            os.path.join(BASE_DIR, 'templates'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
-                'social_django.context_processors.backends',
-                'social_django.context_processors.login_redirect',
-                'django.template.context_processors.request', 
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -203,14 +208,20 @@ WSGI_APPLICATION = 'prototype1.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# Check if we're running in Docker (deployment)
+IN_DOCKER = os.environ.get('IN_DOCKER', False)
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'test3',   # Replace with your PostgreSQL database name
-        'USER': 'postgres',   # Replace with your PostgreSQL username
-        'PASSWORD': '1212312121',  # Replace with your PostgreSQL password  
-        'HOST': 'localhost',  # Use '127.0.0.1' if localhost doesn’t work
-        'PORT': '5432',  # Default PostgreSQL port
+        'NAME': os.environ.get('POSTGRES_DB', 'se-locker'),
+        'USER': os.environ.get('POSTGRES_USER', 'postgres'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', '1212312121'),
+        'HOST': os.environ.get('DB_HOST', 'db' if IN_DOCKER else 'localhost'),
+        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+        'TEST': {
+            'NAME': 'test_se_locker',  # This will create a new database for testing
+        },
     }
 }
 
@@ -249,7 +260,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static'
+]
+
+# Create static directory if it doesn't exist
+if not os.path.exists(BASE_DIR / 'static'):
+    os.makedirs(BASE_DIR / 'static')
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

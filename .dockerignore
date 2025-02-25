@@ -1,0 +1,100 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Images and uploads
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.ico
+*.svg
+qrcodes/
+media/
+uploads/
+
+# Environment
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.docker/
+
+# Documentation
+README.md
+docs/
+*.rst
+*.md
+
+# Test
+.coverage
+htmlcov/
+.tox/
+.pytest_cache/
+pytest.ini
+test*.py
+
+# Misc
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp
+*.temp
+
+# Project specific
+key.txt
+log.txt
+*.qr
+node_modules/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+.circleci/ 

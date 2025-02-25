@@ -1,36 +1,80 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code Generator</title>
-</head>
-<body>
-    <a href="/">
-        <button style="margin-bottom: 20px; background-color: lime;">Back to Home</button>
-    </a>
-    <h2>Generate QR Code</h2>
-    <form id="qrForm" action="{% url 'qr-request' %}" method="post">
-        <label>Start Date:</label>
-        <input type="date" name="start_date" value="{% now 'Y-m-d' %}" required><br>
+<html>
+	<head>
+		<title>QR Code Generator</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				max-width: 800px;
+				margin: 0 auto;
+				padding: 20px;
+			}
+			form {
+				background: #f5f5f5;
+				padding: 20px;
+				border-radius: 5px;
+				margin-top: 20px;
+			}
+			.qr-code {
+				margin-top: 20px;
+				text-align: center;
+			}
+			.qr-code img {
+				max-width: 300px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>QR Code Generator</h1>
+		<form method="post">
+			{% csrf_token %}
+			<div>
+				<label for="username">Username:</label>
+				<input
+					type="text"
+					id="username"
+					name="username"
+					required
+				/>
+			</div>
+			<div>
+				<label for="locker_id">Locker ID:</label>
+				<input
+					type="text"
+					id="locker_id"
+					name="locker_id"
+					required
+				/>
+			</div>
+			<div>
+				<label for="start_date">Start Date:</label>
+				<input
+					type="date"
+					id="start_date"
+					name="start_date"
+					required
+				/>
+			</div>
+			<div>
+				<label for="end_date">End Date:</label>
+				<input
+					type="date"
+					id="end_date"
+					name="end_date"
+					required
+				/>
+			</div>
+			<button type="submit">Generate QR Code</button>
+		</form>
 
-        <label>End Date:</label>
-        <input type="date" name="end_date" value="{% now 'Y-m-d' %}" required><br>
-
-        <label>Username:</label>
-        <input type="text" name="username" value="Admin" required><br>
-
-        <label>Locker ID:</label>
-        <input type="text" name="locker_id" required><br>
-
-        <button type="submit">Generate QR</button>
-    </form>
-
-    <h3>QR Code:</h3>
-    <div id="qr_code">
-        {% if qr_code %}
-            <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code">
-        {% endif %}
-    </div>
-</body>
+		{% if qr_code %}
+		<div class="qr-code">
+			<h2>Generated QR Code</h2>
+			<img
+				src="data:image/png;base64,{{ qr_code }}"
+				alt="QR Code"
+			/>
+		</div>
+		{% endif %}
+	</body>
 </html>

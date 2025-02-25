@@ -1,4 +1,8 @@
 from django.shortcuts import render
+from django.views import View
+
+class MainPage(View):
+    pass
 
 # Empty view just rendering the template
 def home_view(request):

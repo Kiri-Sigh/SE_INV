@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+    web:
+        build: .
+        image: ${REGISTRY:-ghcr.io}/${IMAGE_NAME:-kiri-sigh/se_inv}:${TAG:-latest}
+        restart: always
+        ports:
+            - '8010:8000'
+        environment:
+            - DEBUG=1
+            - DJANGO_SETTINGS_MODULE=prototype1.settings
+            - DATABASE_URL=postgres://postgres:1212312121@db:5432/se-locker
+            - POSTGRES_DB=se-locker
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=1212312121
+            - PYTHONPATH=/app
+            - PYTHONUNBUFFERED=1
+            - IN_DOCKER=true
+        depends_on:
+            db:
+                condition: service_healthy
+        deploy:
+            resources:
+                limits:
+                    memory: 1G
+                reservations:
+                    memory: 512M
+        command: >
+            sh -c "
+            echo '=== Starting web container ===' &&
+            echo 'Python version:' &&
+            python --version &&
+            echo 'Current working directory:' &&
+            pwd &&
+            echo 'Directory contents:' &&
+            ls -la &&
+            echo 'Checking Django installation:' &&
+            python -c 'import django; print(django.__version__)' &&
+            echo 'Waiting for PostgreSQL to be ready...' &&
+            until PGPASSWORD=1212312121 psql -h db -U postgres -c '\l' > /dev/null 2>&1; do
+                echo 'PostgreSQL is unavailable - sleeping'
+                sleep 2
+            done &&
+            echo 'PostgreSQL is ready!' &&
+            echo 'Running migrations...' &&
+            python manage.py migrate --noinput --verbosity 2 &&
+            echo 'Collecting static files...' &&
+            python manage.py collectstatic --noinput &&
+            echo 'Starting Django server...' &&
+            python manage.py runserver 0.0.0.0:8000
+            "
+
+    db:
+        image: postgres:14
+        restart: always
+        volumes:
+            - postgres_prod_data:/var/lib/postgresql/data
+        environment:
+            - POSTGRES_DB=se-locker
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=1212312121
+        deploy:
+            resources:
+                limits:
+                    memory: 1G
+                reservations:
+                    memory: 512M
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U postgres']
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 10s
+
+volumes:
+    postgres_prod_data:

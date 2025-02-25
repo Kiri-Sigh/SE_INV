@@ -5,14 +5,14 @@ from django.utils.safestring import mark_safe
 from inventory.models import CheapItem, ExpensiveItem
 from user.utils import get_google_profile
 
-def list_items(request):
-    query = request.GET.get('q', '')  # Get search query from request, default is empty
-    cheap_items = CheapItem.objects.all()
-    expensive_items = ExpensiveItem.objects.all()
 
-    if query:
-        cheap_items = cheap_items.filter(name__icontains=query)
-        expensive_items = expensive_items.filter(name__icontains=query)
+def handler404(request, exception=None):
+    """Custom 404 handler"""
+    template = loader.get_template('404.html')
+    return TemplateResponse(request, template, {'error_message': str(exception)}, status=404)
+
+class MainPage(View):
+    template_name = 'item_list.html'
 
     google_data = ""
     if request.user.is_authenticated:
@@ -26,10 +26,21 @@ def list_items(request):
         'google_data': google_data
     }
 
-    return render(request, 'item_list.html', context)
 
-def item_detail(request, item_id):
-    item = None
+        if query:
+            cheap_items = cheap_items.filter(name__icontains=query)
+            expensive_items = expensive_items.filter(name__icontains=query)
+        
+        return cheap_items, expensive_items
+
+    def load_items(self):
+        """Load all items"""
+        cheap_items, expensive_items = self.filter_items()
+        return {
+            'cheap_items': cheap_items,
+            'expensive_items': expensive_items,
+            'query': self.request.GET.get('q', '')
+        }
 
     item = CheapItem.objects.filter(component_id=item_id).first() or ExpensiveItem.objects.filter(component_id=item_id).first()
     
@@ -67,3 +78,4 @@ def item_detail(request, item_id):
         'next_month': next_month,
         'next_year': next_year,
         })
+
