@@ -101,7 +101,10 @@ REST_FRAMEWORK = {
     ], 
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
+    ], 
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+    ]
 }
 
 
@@ -161,7 +164,9 @@ SOCIAL_AUTH_PIPELINE = (
     #"social_core.pipeline.social_auth.associate_by_email",  # Optional: Match by email
     "social_core.pipeline.social_auth.auth_allowed",
     "social_core.pipeline.user.get_username",
+    #"user.pipeline.check_user_domain",  
     "social_core.pipeline.user.create_user",
+
     #'user.pipeline.print_google_response',
     #"user.pipeline.allow_reassociation",
     #"user.pipeline.auto_login_existing_user",
@@ -180,7 +185,7 @@ AUTH_USER_MODEL = 'user.CustomUser'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "prototype1/templates",],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

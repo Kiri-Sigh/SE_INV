@@ -24,3 +24,6 @@ total_stock = item.total_stock
     available_stock = total_stock - lent_quantity
 
     return available_stock >= quantity
+
+compantible container runtime (such as docker)
+kubernetes

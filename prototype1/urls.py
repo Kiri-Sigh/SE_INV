@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from user.views import social_profile
-from prototype1.views import home_view
+from prototype1.views import home_view,home_view2
 from qr_app.views import generate_qr
 from prototype1.views import login_view#google_login
 from api.views import custom_logout
@@ -39,7 +39,7 @@ from inventory.views import list_items, item_detail
 
 
 urlpatterns = [
-    path('', home_view, name='home'),
+    path('', home_view2, name='home'),
     path('admin/', admin.site.urls),
     # Ensure this line is present for social authentication
     path('auth/', include('social_django.urls', namespace='social')),
@@ -55,4 +55,5 @@ urlpatterns = [
     # path('auth/refresh/', custom_refresh_token, name="token_refresh"),
     # path('auth/protected/', protected_endpoint, name="protected_endpoint"),
     path('auth/logout/', custom_logout, name="logout"),
+    path('inventory/',include('inventory.urls')),
 ]
