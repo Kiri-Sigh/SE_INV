@@ -1,28 +1,16 @@
 from django.shortcuts import render
-from inventory.models import CheapItem, ExpensiveItem
 from django.contrib.auth.decorators import login_required
-from .serializers import CombinedItemSerializer,CheapItemDetailSerializer
-from rest_framework.permissions import IsAuthenticated
-from .serializers import UserCartSerializer
+from .serializers import CheapItemListSerializer, ExpensiveItemListSerializer,CombinedItemSerializer,CheapItemDetailSerializer,UserCartSerializer
+from rest_framework.permissions import IsAuthenticated,AllowAny
 from rest_framework.authentication import SessionAuthentication
-
 from rest_framework import mixins, generics
-from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404
 from .models import CheapItem, ExpensiveItem, UserCart
-from rest_framework import generics
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
-from inventory.models import CheapItem, ExpensiveItem
-from .serializers import CheapItemListSerializer, ExpensiveItemListSerializer
 
-from rest_framework import mixins, generics
-from rest_framework.permissions import AllowAny
-from .models import CheapItem, ExpensiveItem
 
 def list_items(request):
     query = request.GET.get('q', '')  # Get search query from request, default is empty
@@ -148,6 +136,34 @@ class CombinedItemPaginationListView(generics.GenericAPIView):
 
 
 class UserCartView(APIView):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]  # Only authenticated users can access this view
+
+    def get(self, request, id):
+        print("running")
+
+        # Fetch the cart for the given cart_id
+        try:
+            # Fetch the cart using the cart_id
+            cart = UserCart.objects.get(user__user_id=id)
+            print("cart",cart)
+            # Compare the user_id from the CustomUser (FK) to the authenticated user ID
+            if str(cart.user.user_id) != str(request.session._auth_user_id):
+                # If the IDs don't match, return a 403 Forbidden response
+                return Response({"detail": "You are not allowed to access this cart."}, status=status.HTTP_403_FORBIDDEN)
+
+            # Serialize the cart data
+            serializer = UserCartSerializer(cart)
+
+            # Return the serialized data
+            return Response(serializer.data)
+
+        except UserCart.DoesNotExist:
+            raise Http404
+        
+
+
+class CartItemsView(APIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]  # Only authenticated users can access this view
 

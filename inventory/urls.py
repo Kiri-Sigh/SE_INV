@@ -16,7 +16,7 @@ from .views import (
     ExpensiveItemListView,
     CheapItemPaginationListView,
     ExpensiveItemPaginationListView,
-    UserCartView,
+    UserCartView,CartItemsView,
     CombinedItemPaginationListView,
     CheapItemDetailView
 )
@@ -24,12 +24,13 @@ urlpatterns = [
     path('cheap-items/', CheapItemListView.as_view(), name='cheap-items-list'),  # View for Cheap Items
     path('expensive-items/', ExpensiveItemListView.as_view(), name='expensive-items-list'),  # View for Expensive Items
 
-    # Pagination Views for Cheap and Expensive Items
     path('cheap-items-pagination/', CheapItemPaginationListView.as_view(), name='cheap-items-pagination'),
     path('expensive-items-pagination/', ExpensiveItemPaginationListView.as_view(), name='expensive-items-pagination'),
+    #for now to show every item both cp and exp
     path('main-items/', CombinedItemPaginationListView.as_view(), name='main-items'),
+    #detail page for the cheap item
     path("cp-item/<uuid:component_id>/", CheapItemDetailView.as_view(), name="cheap-item-detail"),
-
-    # UserCart view
-    path('user-cart/<uuid:cart_id>/', UserCartView.as_view(), name='user-cart-view'),
+    #cart items for that cart (user)
+    path('cart-items/<uuid:cart_id>/', CartItemsView.as_view(), name='user-cart-view'),
+    path('user-cart/<uuid:id>/',)
 ]
