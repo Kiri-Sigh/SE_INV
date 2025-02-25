@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from user.views import social_profile
-from prototype1.views import home_view
+from prototype1.views import home_view,home_view2,my_view
 from qr_app.views import generate_qr
 from prototype1.views import login_view
 from api.views import custom_logout
@@ -32,6 +32,8 @@ urlpatterns = [
     
     # not refactored yet
     path('', home_view, name='home'),
+
+   # path('', home_view2, name='home'),
     path('admin/', admin.site.urls),
     path('auth/', include('social_django.urls', namespace='social')),
     path("social-profile/", social_profile, name="social_profile"),
@@ -46,6 +48,8 @@ urlpatterns = [
     # path('auth/protected/', protected_endpoint, name="protected_endpoint"),
     path('auth/logout/', custom_logout, name="logout"),
 
+    path('inventory/',include('inventory.urls')),
+    path('cmd_info/', my_view, name="cmd_info"),
 ]
 
 handler404 = handler404  # Register custom 404 handler

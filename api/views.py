@@ -55,8 +55,10 @@ def issue_jwt_token(request):
 
     set_jwt_cookie(response, str(refresh.access_token), str(refresh))
 
-    print("response", response)
-    return response
+    #print("response", response)
+    #return response
+    return redirect('/')
+
 
 
 @api_view(['POST'])
@@ -99,6 +101,7 @@ def protected_view(request):
     """
     Protected endpoint that requires authentication.
     """
+    print("message:"+ "You have accessed a protected endpoint"+ "user"+ request.user.username)
     return JsonResponse({"message": "You have accessed a protected endpoint", "user": request.user.username})
 
 

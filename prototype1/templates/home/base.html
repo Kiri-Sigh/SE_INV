@@ -3,21 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}My Website{% endblock %}</title>
+    <title>{% block title %}SE INV{% endblock %}</title>
   </head>
   <body>
-    <!-- Header -->
     <header>
-      <h1>Welcome to My Website</h1>
-      {% include 'navbar.html' %}
+      <h1>SE KMITL LOCKER INVENTORY PROJ</h1>
+      {% include 'home/navbar.html' %}
     </header>
 
-    <!-- Main Content -->
     <main>{% block content %} {% endblock %}</main>
 
-    <!-- Footer -->
     <footer>
-      <p>Footer Content</p>
+      <p>Footer</p>
     </footer>
   </body>
 </html>

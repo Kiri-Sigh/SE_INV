@@ -23,9 +23,11 @@ python manage.py makemigrations social_django
 python manage.py migrate social_django
 
 user html view
+
 user main page
--pagination of items
--filter
+-pagination of items(list recently added items, list recently available items, list hot items)
+url,details( ),
+-filter ()
 -navbar linking to other endp
 
 - user item page
@@ -38,7 +40,7 @@ user main page
 user profile page
 uer select date page
 user see all of the user's progress page
-
+-list all current
 deal with caching ,serializer,views,apis,pages,sending emails
 
 dealing with clanedar feature:

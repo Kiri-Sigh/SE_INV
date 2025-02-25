@@ -1,4 +1,5 @@
 from user.models import CustomUser
+from django.core.exceptions import PermissionDenied
 #kwargs social and req is nothing
 #kwargs social return str before @ of email
 #kwargs req is just the endp of the req of login 
@@ -183,7 +184,31 @@ def auto_login_existing_user(backend, uid, user=None, response=None, *args, **kw
     return None  # Continue with default pipeline (creating new user if necessary)
 
 
-from social_core.exceptions import AuthException
+
+
+
+def check_user_domain(backend, details, response, *args, **kwargs):
+    """
+    Restrict Google OAuth login to specific email domains.
+    """
+    print("checking...")
+    print("details",details)
+    allowed_domains = ["kmitl.ac.th"]  # Allowed organizations
+    email = details.get("email", "")
+
+    if not email or "@" not in email:
+        print("denied2")
+
+        raise PermissionDenied("Invalid email format")
+
+    domain = email.split("@")[1] 
+
+    if domain not in allowed_domains:
+        print("denied")
+        raise PermissionDenied(f"Access denied for users from {domain}")
+
+    return
+
 
 def print_google_response(backend, user,strategy, response,uid,details, *args, **kwargs):
    # print("jwtauth",JWTAuthentication())
