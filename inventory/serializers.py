@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from .models import ComponentCategory
-from inventory.models import CheapItem, ExpensiveItem
-from inventory.models import ComponentCategory
+from inventory.models import CheapItem, ExpensiveItem,UserCart,ComponentCategory,UserCartItem
 class ComponentCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ComponentCategory
@@ -67,3 +66,17 @@ class CombinedItemSerializer(serializers.Serializer):
         elif isinstance(obj, ExpensiveItem):
             return "expensive"
         return "unknown"
+
+
+
+class UserCartSerializer(serializers.ModelSerializer):
+    user_id = serializers.PrimaryKeyRelatedField(source='user.user_id', read_only=True)
+
+    class Meta:
+        model = UserCart
+        fields = ['cart_id', 'user_id', 'cart_details'] 
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['cart_details'] = instance.to_dict()
+        return representation

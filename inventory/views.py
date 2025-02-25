@@ -2,6 +2,28 @@ from django.shortcuts import render
 from inventory.models import CheapItem, ExpensiveItem
 from django.contrib.auth.decorators import login_required
 from .serializers import CombinedItemSerializer,CheapItemDetailSerializer
+from rest_framework.permissions import IsAuthenticated
+from .serializers import UserCartSerializer
+from rest_framework.authentication import SessionAuthentication
+
+from rest_framework import mixins, generics
+from rest_framework.permissions import AllowAny
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.http import Http404
+from .models import CheapItem, ExpensiveItem, UserCart
+from rest_framework import generics
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+from inventory.models import CheapItem, ExpensiveItem
+from .serializers import CheapItemListSerializer, ExpensiveItemListSerializer
+
+from rest_framework import mixins, generics
+from rest_framework.permissions import AllowAny
+from .models import CheapItem, ExpensiveItem
+
 def list_items(request):
     query = request.GET.get('q', '')  # Get search query from request, default is empty
     cheap_items = CheapItem.objects.all()
@@ -39,16 +61,6 @@ def item_detail(request, item_id):
 # class ProductViewSet(viewsets.ModelViewSet):
 #     queryset = Product.objects.all()
 #     serializer_class = ProductSerializer
-from rest_framework import generics
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
-from inventory.models import CheapItem, ExpensiveItem
-from .serializers import CheapItemListSerializer, ExpensiveItemListSerializer
-
-from rest_framework import mixins, generics
-from rest_framework.permissions import AllowAny
-from .models import CheapItem, ExpensiveItem
 
 # View for CheapItem
 class CheapItemListView(mixins.ListModelMixin, generics.GenericAPIView):
@@ -73,14 +85,6 @@ class CheapItemDetailView(generics.RetrieveAPIView):
     lookup_field = "component_id"
     permission_classes = [AllowAny]  # Public access
 
-
-from rest_framework import mixins, generics
-from rest_framework.permissions import AllowAny
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from django.http import Http404
-from .models import CheapItem, ExpensiveItem, UserCart
 
 # Custom Pagination
 class CustomPagination(PageNumberPagination):
@@ -143,23 +147,31 @@ class CombinedItemPaginationListView(generics.GenericAPIView):
         })
 
 
-# UserCart view with APIView
 class UserCartView(APIView):
-    #permission_classes = [IsAuthenticated]  # Only authenticated users can access this view
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]  # Only authenticated users can access this view
 
-    def get(self, request, id):
-        # Check if the id in the URL path matches the authenticated user's id
-        if str(request.user.user_id) != str(id):
-            # If the IDs don't match, return a 403 Forbidden response
-            return Response({"detail": "You are not allowed to access this cart."}, status=status.HTTP_403_FORBIDDEN)
-        
+    def get(self, request, cart_id):
+        print("running")
+
+        # Fetch the cart for the given cart_id
         try:
-            # Fetch the cart for the given user id
-            cart = UserCart.objects.get(user_id=id)
-            return Response({"cart": cart.to_dict()})  # Adjust this to your cart model's structure
-        except UserCart.DoesNotExist:
-            raise Http404  # If no cart is found for the given user id
+            # Fetch the cart using the cart_id
+            cart = UserCart.objects.get(cart_id=cart_id)
 
+            # Compare the user_id from the CustomUser (FK) to the authenticated user ID
+            if str(cart.user.id) != str(request.user.id):
+                # If the IDs don't match, return a 403 Forbidden response
+                return Response({"detail": "You are not allowed to access this cart."}, status=status.HTTP_403_FORBIDDEN)
+
+            # Serialize the cart data
+            serializer = UserCartSerializer(cart)
+
+            # Return the serialized data
+            return Response(serializer.data)
+
+        except UserCart.DoesNotExist:
+            raise Http404
 from rest_framework.generics import ListAPIView
 
 

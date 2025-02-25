@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from user.views import social_profile
-from prototype1.views import home_view,home_view2
+from prototype1.views import home_view,home_view2,my_view
 from qr_app.views import generate_qr
 from prototype1.views import login_view#google_login
 from api.views import custom_logout
@@ -56,4 +56,5 @@ urlpatterns = [
     # path('auth/protected/', protected_endpoint, name="protected_endpoint"),
     path('auth/logout/', custom_logout, name="logout"),
     path('inventory/',include('inventory.urls')),
+    path('cmd_info/', my_view, name="cmd_info"),
 ]

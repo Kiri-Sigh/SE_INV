@@ -37,6 +37,12 @@ from cloudinary.models import CloudinaryField
 
 class CustomUser(AbstractUser):
     user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # ROLE_CHOICES = [
+    #     ("user", "User"),
+    #     ("manager", "Manager"),
+    #     ("admin", "Admin"),
+    # ]
+    # role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="user")
     enrolled_year = models.IntegerField(default=2024)
     enrolled_department = models.CharField(max_length=100,blank=True,default="")
     merit = models.IntegerField(default=0)
