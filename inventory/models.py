@@ -13,12 +13,14 @@ class CheapItem(models.Model):
     name = models.CharField(max_length=100)
     category = models.ForeignKey(ComponentCategory, on_delete=models.SET_NULL,null=True, blank=True,related_name="cheap_item_Categories")
     stock = models.IntegerField()
+    stock_non_reserve = models.IntegerField(default=0)
     description = models.TextField()
     quantity_available = models.IntegerField()
     quantity_borrowed = models.IntegerField()
     #item_type = models.CharField(default="cheap")
     weight = models.IntegerField()
     max_time = models.IntegerField(default=0)
+    amount_reserved_rn = models.IntegerField(default=0)
     amount_reserve = models.IntegerField()
     percent_reserve = models.IntegerField()
     requires_admin_approval = models.BooleanField(default=False)
@@ -42,6 +44,8 @@ class ExpensiveItem(models.Model):
     #item_type = models.CharField(max_length=30,default='expensive')
     STATUS_CHOICES = [('P', 'Pending'), ('C', 'Completed')]
     component_status = models.CharField(max_length=1, choices=STATUS_CHOICES)
+    amount_reserved_rn = models.IntegerField(default=0)
+
     amount_reserve = models.IntegerField()
     percent_reserve = models.IntegerField()
     max_time = models.IntegerField(default=30)
@@ -70,14 +74,18 @@ class ExpensiveItemData(models.Model):
     requires_admin_approval = models.BooleanField(default=False)
     change_hands_interval=models.IntegerField()
     reserved = models.BooleanField(default=False)
+    force_reserved = models.BooleanField(default=False)
     image = CloudinaryField('image', blank=True, null=True)  
 
     def save(self, *args, **kwargs):
-        self.student_id = f"{self.user.student_id}" 
+        self.student_id = f"{self.user.user_id}" 
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.name
+        if self.serial_id:
+            return self.serial_id
+        else:
+            return self.expensive_item.name
 
 
 class UserCart(models.Model):
@@ -86,7 +94,7 @@ class UserCart(models.Model):
     user = models.ForeignKey(CustomUser,on_delete=models.CASCADE,null=True,blank=True,related_name="user_cart_Users")
 
     def __str__(self):
-        return self.name
+        return (f"{self.user.username,"'s cart"}")
 
 class UserCartItem(models.Model):
     #same item name as expensive_item
@@ -97,8 +105,8 @@ class UserCartItem(models.Model):
     quantity_specified = models.BooleanField(default=False)
     date_specified = models.BooleanField(default=False)
     quantity = models.IntegerField(default=1)
-    date_start = models.DateTimeField()
-    date_end = models.DateTimeField()
+    date_start = models.DateField()
+    date_end = models.DateField()
 
     def save(self, *args, **kwargs):
         if self.expensive_item_data:
@@ -108,7 +116,10 @@ class UserCartItem(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.name
+        if self.expensive_item_data:
+            return self.expensive_item_data.expensive_item.name
+        else:
+            return self.cheap_item.name
 
 
 

@@ -2,8 +2,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from social_django.models import UserSocialAuth
-from .utils import get_google_profile  # Import the function
-from .utils import get_google_user_data  # Import the function
+from .utils import get_google_profile
+
 
 @login_required  # Ensure only logged-in users can access
 def social_profile(request):
@@ -21,6 +21,8 @@ def social_profile(request):
 #     redirect_uri = strategy.setting("SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI")
 #     print(f"Redirect URI being used: {redirect_uri}")  # Debugging
 #     return redirect("social:begin", backend="google-oauth2")
+from django.shortcuts import render
+from .utils import get_google_user_data  # Import the function
 
 def profile_view(request):
     if not request.user.is_authenticated:
@@ -29,4 +31,4 @@ def profile_view(request):
         google_data = get_google_user_data(request.user)
     except:
         google_data = None
-    return render(request, 'profile.html', {'google_data': google_data})
+    return render(request, 'profile.html', {'google_data': google_data}

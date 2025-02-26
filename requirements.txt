@@ -7,9 +7,20 @@ colorama==0.4.6
 cryptography==44.0.1
 defusedxml==0.7.1
 Django==5.1.6
+djangorestframework
+psycopg2
+django-debug-toolbar
+django-cloudinary-storage
+cloudinary
+uuid
+social-auth-app-django
+social-auth-app-django-mongoengine
+djangorestframework-simplejwt
+pyscript
+requests
+qrcode[pil]
 django-cloudinary-storage==0.3.0
 django-debug-toolbar==5.0.1
-djangorestframework==3.15.2
 djangorestframework_simplejwt==5.4.0
 dnspython==2.7.0
 gunicorn==21.2.0  # Add this line
@@ -17,7 +28,6 @@ idna==3.10
 mongoengine==0.29.1
 oauthlib==3.2.2
 pillow==11.1.0
-psycopg2-binary==2.9.10
 pycparser==2.22
 PyJWT==2.10.1
 pymongo==4.11.1
@@ -27,7 +37,6 @@ requests==2.32.3
 requests-oauthlib==2.0.0
 six==1.17.0
 social-auth-app-django==5.4.3
-social-auth-app-django-mongoengine==1.0.0
 social-auth-core==4.5.6
 social-auth-storage-mongoengine==1.0.1
 sqlparse==0.5.3

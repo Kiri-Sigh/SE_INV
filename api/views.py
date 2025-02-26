@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
 from rest_framework_simplejwt.tokens import RefreshToken
 from social_django.utils import psa
 from django.http import JsonResponse
@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from rest_framework import status
 from django.contrib.auth import logout
 from django.shortcuts import redirect
+from rest_framework.permissions import IsAuthenticated
 
 @api_view(['POST'])
 @psa('social:complete')
@@ -42,6 +43,7 @@ def set_jwt_cookie(response, access_token, refresh_token=None):
 @login_required
 def issue_jwt_token(request):
     print("ran issue_jwt_token")
+    print("request.user",request.user)
     user = request.user  # The authenticated user
     refresh = RefreshToken.for_user(user)  
 
@@ -53,8 +55,10 @@ def issue_jwt_token(request):
 
     set_jwt_cookie(response, str(refresh.access_token), str(refresh))
 
-    print("response", response)
-    return response
+    #print("response", response)
+    #return response
+    return redirect('/')
+
 
 
 @api_view(['POST'])
@@ -89,4 +93,15 @@ def custom_logout(request):
     response.delete_cookie('refresh_token')
 
     return redirect('/') 
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def protected_view(request):
+    """
+    Protected endpoint that requires authentication.
+    """
+    print("message:"+ "You have accessed a protected endpoint"+ "user"+ request.user.username)
+    return JsonResponse({"message": "You have accessed a protected endpoint", "user": request.user.username})
+
 

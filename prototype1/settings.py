@@ -81,7 +81,11 @@ MIDDLEWARE = [
     'social_django.middleware.SocialAuthExceptionMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'prototype1.middleware.AutoLoginMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    #'prototype1.middleware.JWTAuthMiddleware',
+    
+
+
+
 ]
 CSRF_TRUSTED_ORIGINS = [
     #"https://yourwebsite.com",
@@ -94,14 +98,19 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
+
         'rest_framework.permissions.IsAuthenticated',  # Only allow authenticated users to access certain views
 
     ], 
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
+        #cant use JWT without using JS to send headers
+        #'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ], 
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+    ]
 }
 
 
@@ -161,7 +170,9 @@ SOCIAL_AUTH_PIPELINE = (
     #"social_core.pipeline.social_auth.associate_by_email",  # Optional: Match by email
     "social_core.pipeline.social_auth.auth_allowed",
     "social_core.pipeline.user.get_username",
+    #"user.pipeline.check_user_domain",  
     "social_core.pipeline.user.create_user",
+
     #'user.pipeline.print_google_response',
     #"user.pipeline.allow_reassociation",
     #"user.pipeline.auto_login_existing_user",
@@ -184,6 +195,7 @@ TEMPLATES = [
             os.path.join(BASE_DIR, 'prototype1/templates'),
             os.path.join(BASE_DIR, 'templates'),
         ],
+        #'DIRS': [BASE_DIR / "prototype1/templates",],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
