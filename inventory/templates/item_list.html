@@ -1,108 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Item List</title>
-    <style>
-      body {
-        background-color: rgb(0, 0, 0);
-        color: white;
-      }
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0"
+		/>
+		<title>Item List</title>
+		<style>
+			body {
+				background-color: rgb(0, 0, 0);
+				color: white;
+			}
 
-      .grid-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 20px;
-        padding: 20px;
-      }
+			.grid-container {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+				gap: 20px;
+				padding: 20px;
+			}
 
-      .item-card {
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        padding: 10px;
-        text-align: center;
-        background-color: #fff;
-        transition: transform 0.2s ease-in-out;
-      }
+			.item-card {
+				border: 1px solid #ddd;
+				border-radius: 10px;
+				padding: 10px;
+				text-align: center;
+				background-color: #fff;
+				transition: transform 0.2s ease-in-out;
+			}
 
-      .item-card:hover {
-        transform: scale(1.05);
-      }
+			.item-card:hover {
+				transform: scale(1.05);
+			}
 
-      .item-image {
-        width: 100%;
-        height: 150px;
-        object-fit: cover;
-        border-radius: 5px;
-      }
+			.item-image {
+				width: 100%;
+				height: 150px;
+				object-fit: cover;
+				border-radius: 5px;
+			}
 
-      .item-name {
-        display: block;
-        margin-top: 10px;
-        font-weight: bold;
-        color: #333;
-        text-decoration: none;
-      }
+			.item-name {
+				display: block;
+				margin-top: 10px;
+				font-weight: bold;
+				color: #333;
+				text-decoration: none;
+			}
 
-      .item-name:hover {
-        color: #007bff;
-      }
-    </style>
-  </head>
-  <body>
-    <a href="/">
-      <button style="margin-bottom: 20px; background-color: skyblue">
-        Home
-      </button>
-    </a>
+			.item-name:hover {
+				color: #007bff;
+			}
+		</style>
+	</head>
+	<body>
+		<a href="/">
+			<button style="margin-bottom: 20px; background-color: skyblue">
+				Home
+			</button>
+		</a>
 
-    <h1>SEARCH BAR</h1>
+		{% if user.is_authenticated %}
+		<p>YOU ARE LOGGED IN AS {{user.username}}</p>
+		<a href="">
+			<button style="margin-bottom: 20px; background-color: skyblue">
+				Cart
+			</button>
+		</a>
+		{% else %}
+		<p>YOU ARE NOT LOGGED IN, SOME FEATURES MAY NOT BE AVAILABLE.</p>
+		<a href="{% url 'login' %}?next=/items/">
+			<button style="margin-bottom: 20px; background-color: skyblue">
+				Login NOW!!!!
+			</button>
+		</a>
+		{% endif %}
 
-    <form method="GET" action="{% url 'list_items' %}">
-      <input
-        type="text"
-        name="q"
-        placeholder="Search items..."
-        value="{{ query }}"
-      />
-      <button type="submit">Search</button>
-    </form>
+		<h1>SEARCH BAR</h1>
 
-    <h2>Cheap Items</h2>
-    <div class="grid-container">
-      {% for item in cheap_items %}
-      <div class="item-card">
-        <a href="{% url 'item_detail' item.component_id %}">
-          <img
-            src="{{ item.image.url }}"
-            alt="{{ item.name }}"
-            class="item-image"
-          />
-          <span class="item-name">{{ item.name }}</span>
-        </a>
-      </div>
-      {% empty %}
-      <p>No cheap items found.</p>
-      {% endfor %}
-    </div>
+		<form
+			method="GET"
+			action="{% url 'inventory:list_items' %}"
+		>
+			<input
+				type="text"
+				name="q"
+				placeholder="Search items..."
+				value="{{ query }}"
+			/>
+			<button type="submit">Search</button>
+		</form>
 
-    <h2>Expensive Items</h2>
-    <div class="grid-container">
-      {% for item in expensive_items %}
-      <div class="item-card">
-        <a href="{% url 'item_detail' item.component_id %}">
-          <img
-            src="{{ item.image.url }}"
-            alt="{{ item.name }}"
-            class="item-image"
-          />
-          <span class="item-name">{{ item.name }}</span>
-        </a>
-      </div>
-      {% empty %}
-      <p>No expensive items found.</p>
-      {% endfor %}
-    </div>
-  </body>
+		<h2>Cheap Items</h2>
+		<div class="grid-container">
+			{% for item in cheap_items %}
+			<div class="item-card">
+				<a href="{% url 'inventory:item_detail' item.component_id %}">
+					<img
+						src="{{ item.image.url }}"
+						alt="{{ item.name }}"
+						class="item-image"
+					/>
+					<span class="item-name">{{ item.name }}</span>
+				</a>
+			</div>
+			{% empty %}
+			<p>No cheap items found.</p>
+			{% endfor %}
+		</div>
+
+		<h2>Expensive Items</h2>
+		<div class="grid-container">
+			{% for item in expensive_items %}
+			<div class="item-card">
+				<a href="{% url 'inventory:item_detail' item.component_id %}">
+					<img
+						src="{{ item.image.url }}"
+						alt="{{ item.name }}"
+						class="item-image"
+					/>
+					<span class="item-name">{{ item.name }}</span>
+				</a>
+			</div>
+			{% empty %}
+			<p>No expensive items found.</p>
+			{% endfor %}
+		</div>
+	</body>
 </html>

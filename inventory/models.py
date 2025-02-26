@@ -94,7 +94,7 @@ class UserCart(models.Model):
     user = models.ForeignKey(CustomUser,on_delete=models.CASCADE,null=True,blank=True,related_name="user_cart_Users")
 
     def __str__(self):
-        return (f"{self.user.username,"'s cart"}")
+        return (f"{self.user.username},'s cart")
 
 class UserCartItem(models.Model):
     #same item name as expensive_item

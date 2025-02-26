@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>User Profile</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				max-width: 800px;
+				margin: 0 auto;
+				padding: 20px;
+			}
+			.profile-info {
+				background: #f5f5f5;
+				padding: 20px;
+				border-radius: 5px;
+				margin-top: 20px;
+			}
+			.profile-picture {
+				max-width: 200px;
+				border-radius: 50%;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>User Profile</h1>
+
+		{% if user.is_authenticated %}
+		<div class="profile-info">
+			{% if user.profile_picture %}
+			<img
+				src="{{ user.profile_picture }}"
+				alt="Profile Picture"
+				class="profile-picture"
+			/>
+			{% endif %}
+
+			<h2>{{ user.username }}</h2>
+			<p>Email: {{ user.email }}</p>
+			<p>Enrolled Year: {{ user.enrolled_year }}</p>
+			<p>Department: {{ user.enrolled_department }}</p>
+			<p>Merit: {{ user.merit }}</p>
+			<p>Level: {{ user.level }}</p>
+		</div>
+		{% else %}
+		<p>
+			Please <a href="{% url 'login' %}">log in</a> to view your profile.
+		</p>
+		{% endif %}
+	</body>
+</html>
