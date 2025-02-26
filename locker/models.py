@@ -88,7 +88,7 @@ class LockerInteractionLog(models.Model):
     def save(self, *args, **kwargs):
         if self.user:
             self.name = self.user.username
-            self.str_log=f"{"log_id: "+self.locker_log_id+", name: "+self.name+", email: "+self.user.email+", possible date-time use of locker"+self.start_date_pos+" - "+self.end_date_pos+", use locker date-time: "+self.date_time_interaction+", operation done: "+self.operation}"
+            self.str_log = f"log_id: {self.locker_log_id}, name: {self.name}, email: {self.user.email}, possible date-time use of locker {self.start_date_pos} - {self.end_date_pos}, use locker date-time: {self.date_time_interaction}, operation done: {self.operation}"
                         
         super().save(*args, **kwargs)
     def __str__(self):

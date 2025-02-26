@@ -26,7 +26,7 @@ from . import views
 app_name = 'inventory'
 
 urlpatterns = [
-     path('items/', views.MainPage.as_view(), name='list_items'),
+    path('items/', views.MainPage.as_view(), name='list_items'),
     path('items/<uuid:item_id>/', views.DetailPage.as_view(), name='item_detail'),
     path('cheap-items/', CheapItemListView.as_view(), name='cheap-items-list'),  # View for Cheap Items
     path('expensive-items/', ExpensiveItemListView.as_view(), name='expensive-items-list'),  # View for Expensive Items
@@ -39,5 +39,5 @@ urlpatterns = [
     path("cp-item/<uuid:component_id>/", CheapItemDetailView.as_view(), name="cheap-item-detail"),
     #cart items for that cart (user)
     path('cart-items/<uuid:cart_id>/', CartItemsView.as_view(), name='user-cart-view'),
-    path('user-cart/<uuid:id>/',)
+    path('user-cart/<uuid:id>/',UserCartView.as_view(),name='user-cart-view')
 ]

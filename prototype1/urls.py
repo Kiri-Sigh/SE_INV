@@ -22,33 +22,21 @@ from prototype1.views import home_view,home_view2,my_view
 from qr_app.views import generate_qr
 from prototype1.views import login_view
 from api.views import custom_logout
-from inventory.views import MainPage, DetailPage, handler404
+from inventory.views import handler404
 
 urlpatterns = [
-    # Already refactored to OOP
-    path('inventory/', include('inventory.urls')),
-    path('items/', MainPage.as_view(), name='list_items'),
-    path('items/<uuid:item_id>/', DetailPage.as_view(), name='item_detail'),
+    path('inventory/', include('inventory.urls')),  # app_name is already set in inventory/urls.py
     
     # not refactored yet
     path('', home_view, name='home'),
-
-   # path('', home_view2, name='home'),
     path('admin/', admin.site.urls),
     path('auth/', include('social_django.urls', namespace='social')),
     path("social-profile/", social_profile, name="social_profile"),
     path('login/', login_view, name='login'),
     path('qr-request/', generate_qr, name='qr-request'),
-    path('social/', include('user.urls')),  # Include your app’s URLs
+    path('social/', include('user.urls')),  # Include your app's URLs
     path('api/', include('api.urls')),  # Include the auth API URLs
-    path('items/', list_items, name='list_items'),
-    path('items/<uuid:item_id>/', item_detail, name='item_detail'),
-    # path('auth/google/login/', exchange_google_token, name="google_login"),
-    # path('auth/refresh/', custom_refresh_token, name="token_refresh"),
-    # path('auth/protected/', protected_endpoint, name="protected_endpoint"),
     path('auth/logout/', custom_logout, name="logout"),
-
-    path('inventory/',include('inventory.urls')),
     path('cmd_info/', my_view, name="cmd_info"),
 ]
 

@@ -31,4 +31,4 @@ def profile_view(request):
         google_data = get_google_user_data(request.user)
     except:
         google_data = None
-    return render(request, 'profile.html', {'google_data': google_data}
+    return render(request, 'profile.html', {'google_data': google_data})
