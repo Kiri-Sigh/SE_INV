@@ -29,11 +29,21 @@
           Admin Page
         </button>
       </a>
+      
+      {% if user.is_authenticated %}
+      <a href="/social-profile">
+        <button style="margin-bottom: 20px; background-color: skyblue">
+          Profile
+        </button>
+      </a>
+      {% else %}
       <a href="{% url 'login' %}">
         <button style="margin-bottom: 20px; background-color: skyblue">
           Login Page
         </button>
       </a>
+      {% endif %}
+
       <a href="{% url 'qr-request' %}">
         <button style="margin-bottom: 20px; background-color: skyblue">
           QR Request Page

@@ -1,3 +1,4 @@
+
 # from django.urls import path, include
 # from rest_framework.routers import DefaultRouter
 # from .views import ProductViewSet
@@ -20,7 +21,13 @@ from .views import (
     CombinedItemPaginationListView,
     CheapItemDetailView
 )
+from . import views
+
+app_name = 'inventory'
+
 urlpatterns = [
+     path('items/', views.MainPage.as_view(), name='list_items'),
+    path('items/<uuid:item_id>/', views.DetailPage.as_view(), name='item_detail'),
     path('cheap-items/', CheapItemListView.as_view(), name='cheap-items-list'),  # View for Cheap Items
     path('expensive-items/', ExpensiveItemListView.as_view(), name='expensive-items-list'),  # View for Expensive Items
 

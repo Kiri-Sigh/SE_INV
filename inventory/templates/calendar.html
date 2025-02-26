@@ -1,0 +1,36 @@
+<!-- templates/calendar.html -->
+<style>
+    .calendar-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .calendar-table th, .calendar-table td {
+        border: 1px solid white;
+        padding: 10px;
+        text-align: center;
+    }
+    .calendar-table th {
+        background-color: rgb(30, 30, 30);
+        color: white;
+    }
+    .calendar-table td {
+        background-color: rgb(50, 50, 50);
+        color: white;
+    }
+</style>
+
+
+<div>
+    <h2>Calendar</h2>
+    <div>{{ calendar|safe }}</div>
+</div>
+
+<div class="calendar-nav">
+    <a href="?year={{ prev_year }}&month={{ prev_month }}">
+        <button>⬅ Previous Month</button>
+    </a>
+    <h2>{{ current_month_name }} {{ current_year }}</h2>
+    <a href="?year={{ next_year }}&month={{ next_month }}">
+        <button>Next Month ➡</button>
+    </a>
+</div>

@@ -57,6 +57,20 @@
       </button>
     </a>
 
+    {% if user.is_authenticated %}
+        <p>YOU ARE LOGGED IN AS {{user.username}}</p>
+        <a href="">
+            <button style="margin-bottom: 20px; background-color: skyblue;">Cart</button>
+        </a>
+    {% else %}
+        <p>YOU ARE NOT LOGGED IN, SOME FEATURES MAY NOT BE AVAILABLE.</p>
+        <a href="{% url 'login' %}?next=/items/">
+            <button style="margin-bottom: 20px; background-color: skyblue">
+              Login NOW!!!!
+            </button>
+          </a>
+    {% endif %}
+    
     <h1>SEARCH BAR</h1>
 
     <form method="GET" action="{% url 'list_items' %}">

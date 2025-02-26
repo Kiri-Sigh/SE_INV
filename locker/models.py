@@ -40,6 +40,7 @@ class Locker(models.Model):
 
     # def save(self, *args, **kwargs):
     #     if self.student and self.admin:
+    #         raise ValueError("Only a cheap OR an admin can be assigned, not both.")
     #         raise ValueError("Only a student OR an admin can be assigned, not both.")
     #     if self.student:
     #         self.name = self.student.name  

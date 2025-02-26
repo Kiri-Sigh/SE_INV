@@ -1,68 +1,79 @@
 from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from .models import QRLog
 import qrcode
+import io
 import base64
-from io import BytesIO
-from cryptography.fernet import Fernet
 import json
+from cryptography.fernet import Fernet
+import os
 
-# Read the key from key.txt
-with open("key.txt", "rb") as key_file:
-    key = key_file.read()
+def get_encryption_key():
+    try:
+        with open("key.txt", "rb") as key_file:
+            return key_file.read()
+    except FileNotFoundError:
+        # For testing purposes, generate a new key if file doesn't exist
+        if os.environ.get('DJANGO_SETTINGS_MODULE') == 'prototype1.settings':
+            key = Fernet.generate_key()
+            with open("key.txt", "wb") as key_file:
+                key_file.write(key)
+            return key
+        return Fernet.generate_key()
 
-cipher = Fernet(key)
+# Move key loading to a function
+encryption_key = get_encryption_key()
+cipher = Fernet(encryption_key)
 
-@csrf_exempt
 def generate_qr(request):
-    if request.method == "POST":
-        start_date = request.POST.get("start_date")
-        end_date = request.POST.get("end_date")
-        username = request.POST.get("username")
-        locker_id = request.POST.get("locker_id")
+    if request.method == 'POST':
+        # Get form data
+        username = request.POST.get('username')
+        locker_id = request.POST.get('locker_id')
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
 
-        # Create JSON data
-        data = {
-            "start_date": start_date,
-            "end_date": end_date,
-            "username": username,
-            "locker_id": locker_id
-        }
-        json_data = json.dumps(data).encode()
-
-        # Encrypt the JSON data
-        encrypted_data = cipher.encrypt(json_data)
+        # Create data string and encrypt it
+        data = f"{username}|{locker_id}|{start_date}|{end_date}"
+        encrypted_data = cipher.encrypt(data.encode())
 
         # Generate QR code
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
         qr.add_data(encrypted_data)
         qr.make(fit=True)
-        img = qr.make_image(fill="black", back_color="white")
+        qr_image = qr.make_image(fill_color="black", back_color="white")
 
-        # Convert QR code image to base64
-        buffer = BytesIO()
-        img.save(buffer, format="PNG")
-        img_str = base64.b64encode(buffer.getvalue()).decode()
+        # Convert QR code to base64 string
+        buffer = io.BytesIO()
+        qr_image.save(buffer, format="PNG")
+        qr_code_base64 = base64.b64encode(buffer.getvalue()).decode()
 
-        return render(request, "qr_form.html", {"qr_code": img_str})
-    return render(request, "qr_form.html")
+        # Save QR log
+        # QRLog.objects.create(
+        #     username=username,
+        #     locker_id=locker_id,
+        #     start_date=start_date,
+            # end_date=end_date,
+        #     qr_code=qr_code_base64
+        # )
+
+        return render(request, 'qr_form.html', {'qr_code': qr_code_base64})
+    return render(request, 'qr_form.html')
 
 @csrf_exempt
+@require_http_methods(["POST"])
 def log_data(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            username = data.get("username")
-            locker_id = data.get("locker_id")
-            action = data.get("action")
-            date_time_open = data.get("timestamp")
-
-            # Log data to log.txt
-            with open("log.txt", "a") as log_file:
-                log_file.write(f"Username: {username}, DateTimeOpen: {date_time_open}, LockerID: {locker_id}, Action: {action}\n")
-
-            return JsonResponse({"status": "success", "message": "Data logged successfully"})
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=400)
-    return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+    try:
+        data = json.loads(request.body)
+        # Log the data
+        with open('log.txt', 'a') as log_file:
+            log_file.write(f"{data['timestamp']} - User: {data['username']} - Locker: {data['locker_id']} - Action: {data['action']}\n")
+        return JsonResponse({'status': 'success'})
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
