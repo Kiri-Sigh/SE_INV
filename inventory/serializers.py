@@ -69,14 +69,39 @@ class CombinedItemSerializer(serializers.Serializer):
 
 
 
+# class UserCartSerializer(serializers.ModelSerializer):
+#     user_id = serializers.PrimaryKeyRelatedField(source='user.user_id', read_only=True)
+
+#     class Meta:
+#         model = UserCart
+#         fields = ['cart_id', 'user_id', 'cart_details'] 
+
+#     def to_representation(self, instance):
+#         representation = super().to_representation(instance)
+#         representation['cart_details'] = instance.to_dict()
+#         return representation
+
+
+
+# class UserCartSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = UserCart
+#         fields = ['cart_id', 'user']
+
+class UserCartItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserCartItem
+        fields = ['user_cart_item_id', 'user_cart', 'expensive_item_data', 'cheap_item', 'quantity', 'date_start', 'date_end']
+
+
+class CartItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserCartItem
+        fields = "__all__"  # Or specify required fields: ['id', 'product', 'quantity', ...]
+
 class UserCartSerializer(serializers.ModelSerializer):
-    user_id = serializers.PrimaryKeyRelatedField(source='user.user_id', read_only=True)
+    user_cart_Users = UserCartItemSerializer(many=True, read_only=True, source="user_cart_item_Exp_item_data")  # Include cart items
 
     class Meta:
         model = UserCart
-        fields = ['cart_id', 'user_id', 'cart_details'] 
-
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        representation['cart_details'] = instance.to_dict()
-        return representation
+        fields = ['cart_id', 'user', 'user_cart_Users']
