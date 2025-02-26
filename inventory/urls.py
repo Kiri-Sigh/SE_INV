@@ -31,6 +31,6 @@ urlpatterns = [
     #detail page for the cheap item
     path("cp-item/<uuid:component_id>/", CheapItemDetailView.as_view(), name="cheap-item-detail"),
     #cart items for that cart (user)
-    path('cart-items/<uuid:cart_id>/', CartItemsView.as_view(), name='user-cart-view'),
-    path('user-cart/<uuid:id>/',)
+    path('cart-items/<uuid:cart_id>/', CartItemsView.as_view(), name='cart-items'),
+    path('user-cart/<uuid:user_id>/', UserCartView.as_view(), name='user-cart')
 ]

@@ -1,14 +1,15 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from .serializers import CheapItemListSerializer, ExpensiveItemListSerializer,CombinedItemSerializer,CheapItemDetailSerializer,UserCartSerializer
-from rest_framework.permissions import IsAuthenticated,AllowAny
+from .serializers import CheapItemListSerializer, ExpensiveItemListSerializer,CombinedItemSerializer,CheapItemDetailSerializer,UserCartSerializer, UserCartItemSerializer
+from rest_framework.permissions import IsAuthenticated,AllowAny,DjangoModelPermissions
 from rest_framework.authentication import SessionAuthentication
 from rest_framework import mixins, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404
-from .models import CheapItem, ExpensiveItem, UserCart
+from .models import CheapItem, ExpensiveItem,UserCart, UserCartItem
+
 from rest_framework.pagination import PageNumberPagination
 
 
@@ -136,33 +137,20 @@ class CombinedItemPaginationListView(generics.GenericAPIView):
 
 
 class UserCartView(APIView):
-    authentication_classes = [SessionAuthentication]
-    permission_classes = [IsAuthenticated]  # Only authenticated users can access this view
-
-    def get(self, request, id):
-        print("running")
-
-        # Fetch the cart for the given cart_id
+    def get(self, request, user_id):
         try:
-            # Fetch the cart using the cart_id
-            cart = UserCart.objects.get(user__user_id=id)
-            print("cart",cart)
-            # Compare the user_id from the CustomUser (FK) to the authenticated user ID
-            if str(cart.user.user_id) != str(request.session._auth_user_id):
-                # If the IDs don't match, return a 403 Forbidden response
-                return Response({"detail": "You are not allowed to access this cart."}, status=status.HTTP_403_FORBIDDEN)
+            # Ensure to prefetch related user cart items using the correct related_name
+            user_cart = UserCart.objects.filter(user_id=user_id).prefetch_related("user_cart_item_Exp_item_data")
 
-            # Serialize the cart data
-            serializer = UserCartSerializer(cart)
+            if not user_cart.exists():
+                return Response({"message": "No carts found for this user"}, status=status.HTTP_404_NOT_FOUND)
 
-            # Return the serialized data
-            return Response(serializer.data)
-
-        except UserCart.DoesNotExist:
-            raise Http404
+            # Serialize the user cart data, including nested cart items
+            serializer = UserCartSerializer(user_cart, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         
-
-
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 class CartItemsView(APIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]  # Only authenticated users can access this view
