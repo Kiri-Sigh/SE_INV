@@ -82,20 +82,20 @@ class ExpensiveItemData(models.Model):
             return self.expensive_item.name
 
 
-class UserCart(models.Model):
-    #same item name as expensive_item
-    cart_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(CustomUser,on_delete=models.CASCADE,null=True,blank=True,related_name="user_cart_Users")
+# class UserCart(models.Model):
+#     #same item name as expensive_item
+#     cart_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+#     user = models.ForeignKey(CustomUser,on_delete=models.CASCADE,null=True,blank=True,related_name="user_cart_Users")
 
-    def __str__(self):
-        return (f"{self.user.username},'s cart")
+#     def __str__(self):
+#         return (f"{self.user.username},'s cart")
 
-class UserCartItem(models.Model):
+class BorrowItemList(models.Model):
     #same item name as expensive_item
-    user_cart_item_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user_cart = models.ForeignKey(UserCart,on_delete=models.CASCADE,null=True,blank=True,related_name="user_cart_item_Exp_item_data")
-    expensive_item_data = models.ForeignKey(ExpensiveItemData,on_delete=models.SET_NULL,null=True,blank=True,related_name="user_cart_item_Exp_item_data")
-    cheap_item = models.ForeignKey(CheapItem, on_delete=models.SET_NULL, null=True, blank=True,     related_name="user_cart_item_Cheap_item_data")
+    borrow_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,null=True,blank=True,related_name="borrow_item_User")
+    expensive_item_data = models.ForeignKey(ExpensiveItemData,on_delete=models.SET_NULL,null=True,blank=True,related_name="borrow_item_Exp_item_data")
+    cheap_item = models.ForeignKey(CheapItem, on_delete=models.SET_NULL, null=True, blank=True, related_name="borrow_item_Cheap_item_data")
     quantity_specified = models.BooleanField(default=False)
     date_specified = models.BooleanField(default=False)
     quantity = models.IntegerField(default=1)
