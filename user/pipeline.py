@@ -1,15 +1,21 @@
+from social_django.models import UserSocialAuth
+from social_core.exceptions import AuthAlreadyAssociated
+from django.contrib.auth import get_user_model
 from user.models import CustomUser
 from django.core.exceptions import PermissionDenied
-#kwargs social and req is nothing
-#kwargs social return str before @ of email
-#kwargs req is just the endp of the req of login 
+# kwargs social and req is nothing
+# kwargs social return str before @ of email
+# kwargs req is just the endp of the req of login
 
-#pipeline returns dict to next pipline and it will be in kwargs dict
+# pipeline returns dict to next pipline and it will be in kwargs dict
+
+
 def set_student_defaults(strategy, details, backend, user=None, *args, **kwargs):
     """ Ensure new users have required fields """
     print("-----------set_student_defaults----------")
 
-    if user and isinstance(user, CustomUser):  # Check if user exists & is correct type
+    # Check if user exists & is correct type
+    if user and isinstance(user, CustomUser):
         user.enrolled_year = 2024
         user.merit = 0
         user.save()
@@ -31,34 +37,37 @@ def set_student_defaults(strategy, details, backend, user=None, *args, **kwargs)
 
 # user/pipeline.py
 
-from social_django.models import UserSocialAuth
 
-#successfully created ;-;
+# successfully created ;-;
+
+
 def save_google_profile2(backend, user, response, *args, **kwargs):
     print("-----------save_google_profile----------")
-    
+
     if backend.name == 'google-oauth2':
         email = response.get('email')  # Google's unique user ID
         profile_picture = response.get('picture', None)
         google_uid = response.get('sub')  # Google's unique user ID
 
-        #custom_user = CustomUser.objects.filter(email=email).first()
-        print("profile pic",profile_picture)
-        #custom_user.profile_picture = profile_picture
-        #custom_user.save()
+        # custom_user = CustomUser.objects.filter(email=email).first()
+        print("profile pic", profile_picture)
+        # custom_user.profile_picture = profile_picture
+        # custom_user.save()
         # Ensure the user exists in UserSocialAuth
-        custom_user = CustomUser.objects.filter( google_id=google_uid).first()
+        custom_user = CustomUser.objects.filter(google_id=google_uid).first()
 
         if custom_user:
             print("create custom user")
             custom_user.profile_picture = profile_picture
             custom_user.save()
         else:
-            print("another_email:",CustomUser.objects.filter( email=email).first().email)
-            print("true?:",CustomUser.objects.filter( email=email).first().email=="syril.tuladhar.2@gmail.com")
-            
-            another_user=CustomUser.objects.filter( email=email).first()
-        
+            print("another_email:", CustomUser.objects.filter(
+                email=email).first().email)
+            print("true?:", CustomUser.objects.filter(
+                email=email).first().email == "syril.tuladhar.2@gmail.com")
+
+            another_user = CustomUser.objects.filter(email=email).first()
+
             another_user.profile_picture = profile_picture
             another_user.google_id = google_uid
             another_user.save()
@@ -75,22 +84,23 @@ def save_google_profile2(backend, user, response, *args, **kwargs):
             #     custom_user.profile_picture = profile_picture
             #     custom_user.google_id = google_uid
             #     custom_user.save()
-            
+
             print(f"Custom user created: {custom_user is not None}")
-            #print(f"Profile picture URL: {custom_user.profile_picture}")
-        
-            #print("User not found in UserSocialAuth")
+            # print(f"Profile picture URL: {custom_user.profile_picture}")
+
+            # print("User not found in UserSocialAuth")
+
 
 def save_google_profile(backend, user, response, *args, **kwargs):
     print("-----------save_google_profile----------")
-    
+
     if backend.name == 'google-oauth2':
         email = response.get('email')  # Google's unique user ID
         profile_picture = response.get('picture', None)
         google_uid = response.get('sub')  # Google's unique user ID
 
         print("profile pic", profile_picture)
-        
+
         # Ensure the user exists in UserSocialAuth
         custom_user = CustomUser.objects.filter(google_id=google_uid).first()
 
@@ -124,29 +134,29 @@ def save_google_profile(backend, user, response, *args, **kwargs):
                 except Exception as e:
                     print(f"Error creating user: {e}")
 
+
 def save_google_session(backend, user, response, request, *args, **kwargs):
     if backend.name == "google-oauth2":
-        #print("running save_google_session")
+        # print("running save_google_session")
         request.session["google_id"] = response.get("sub")  # Store Google ID
 
 
-from django.contrib.auth import get_user_model
-from social_core.exceptions import AuthAlreadyAssociated
-from social_django.models import UserSocialAuth
-
 User = get_user_model()
 
-#useless
+# useless
+
+
 def allow_reassociation(backend, user, *args, **kwargs):
-    #print("--------ALLOW_REASSOCIATION--------")
-    
+    # print("--------ALLOW_REASSOCIATION--------")
+
     if not user:
         email = kwargs.get('details', {}).get('email')
         if email:
             try:
                 # Find existing user by email
                 user = get_user_model().objects.get(email=email)
-                existing_social_user = UserSocialAuth.objects.filter(user=user, provider=backend.name).exists()
+                existing_social_user = UserSocialAuth.objects.filter(
+                    user=user, provider=backend.name).exists()
                 if existing_social_user:
                     return {'user': user}
                 else:
@@ -155,7 +165,9 @@ def allow_reassociation(backend, user, *args, **kwargs):
                 pass
     return None
 
-#useless
+# useless
+
+
 def auto_login_existing_user(backend, uid, user=None, response=None, *args, **kwargs):
     print("--------auto_login_existing_user--------")
 
@@ -165,8 +177,9 @@ def auto_login_existing_user(backend, uid, user=None, response=None, *args, **kw
     if user:  # User is already authenticated, no need to check
         return {"user": user}
 
-    social_auth = UserSocialAuth.objects.filter(provider=backend.name, uid=uid).first()
-    #print("social_auth: ",social_auth)
+    social_auth = UserSocialAuth.objects.filter(
+        provider=backend.name, uid=uid).first()
+    # print("social_auth: ",social_auth)
     if social_auth:
         return {"user": social_auth.user}  # Log in the existing user
 
@@ -176,56 +189,59 @@ def auto_login_existing_user(backend, uid, user=None, response=None, *args, **kw
         try:
 
             existing_user = User.objects.get(email=email)
-            #print("existing_user: ",existing_user)
-            return {"user": existing_user}  # Log in the user with the existing email
+            # print("existing_user: ",existing_user)
+            # Log in the user with the existing email
+            return {"user": existing_user}
         except User.DoesNotExist:
             pass
 
-    return None  # Continue with default pipeline (creating new user if necessary)
-
-
-
+    # Continue with default pipeline (creating new user if necessary)
+    return None
 
 
 def check_user_domain(backend, details, response, *args, **kwargs):
     """
     Restrict Google OAuth login to specific email domains.
     """
-    print("checking...")
-    print("details",details)
-    allowed_domains = ["kmitl.ac.th"]  # Allowed organizations
-    email = details.get("email", "")
+    print("Checking user domain...")
+    print("OAuth details:", details)
+
+    allowed_domains = ["kmitl.ac.th",]
+
+    # Ensure lowercase and no spaces
+    email = details.get("email", "").strip().lower()
 
     if not email or "@" not in email:
-        print("denied2")
-
+        print("Denied: Invalid email format")
         raise PermissionDenied("Invalid email format")
 
-    domain = email.split("@")[1] 
+    domain = email.split("@")[1]  # Extract domain
+    print(f"Extracted domain: {domain}")
 
     if domain not in allowed_domains:
-        print("denied")
+        print(f"Denied: Access denied for users from {domain}")
         raise PermissionDenied(f"Access denied for users from {domain}")
 
+    print("Domain check passed!")
     return
 
 
-def print_google_response(backend, user,strategy, response,uid,details, *args, **kwargs):
+def print_google_response(backend, user, strategy, response, uid, details, *args, **kwargs):
    # print("jwtauth",JWTAuthentication())
     print("Current strategy:", strategy)
-    print("request",request)
-    print("backend",backend)
+    print("request", request)
+    print("backend", backend)
     print("Current user:", user)
     print("Current details:", details)
     print("Current uid:", uid)
-    print("Current uid:", uid)   
+    print("Current uid:", uid)
     print("Current *args", args)
-    #print("Current *args", *args)
+    # print("Current *args", *args)
     print("Current  **kwargs", kwargs)
     request = kwargs.get('social')
     print("kwargs - social: ", request)
     print("")
-    print("picture?:",response.get('picture', None))
+    print("picture?:", response.get('picture', None))
     """
     This function prints the response data received from Google
     when a user logs in via Google OAuth2.

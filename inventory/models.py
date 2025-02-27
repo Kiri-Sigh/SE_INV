@@ -13,18 +13,14 @@ class CheapItem(models.Model):
     name = models.CharField(max_length=100)
     category = models.ForeignKey(ComponentCategory, on_delete=models.SET_NULL,null=True, blank=True,related_name="cheap_item_Categories")
     stock = models.IntegerField()
-    stock_non_reserve = models.IntegerField(default=0)
-    description = models.TextField()
-    quantity_available = models.IntegerField()
-    quantity_borrowed = models.IntegerField()
-    #item_type = models.CharField(default="cheap")
-    weight = models.IntegerField()
-    max_time = models.IntegerField(default=0)
+    description = models.TextField(default="hello, this is a default description")
+    weight = models.IntegerField(default=0)
+    max_time = models.IntegerField(default=30)
+    STATUS_CHOICES = [('A', 'Available'), ('U', 'Unavailable')]
+    component_status = models.CharField(max_length=1, choices=STATUS_CHOICES)
     amount_reserved_rn = models.IntegerField(default=0)
     amount_reserve = models.IntegerField()
-    percent_reserve = models.IntegerField()
     requires_admin_approval = models.BooleanField(default=False)
-
     image = CloudinaryField('image')
 
     def __str__(self):
@@ -37,22 +33,20 @@ class ExpensiveItem(models.Model):
     component_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(blank=False,null=False,max_length=150)
     category = models.ForeignKey(ComponentCategory, on_delete=models.SET_NULL,null=True,blank=True, related_name="exp_item_Categories")
-    stock = models.IntegerField(default=1)
-    description = models.TextField()
-    quantity_available = models.IntegerField()
-    quantity_borrowed = models.IntegerField()
+    # stock = models.IntegerField(default=1)
+    description = models.TextField(default="hello, this is a default description")
+    # quantity_available = models.IntegerField()
+    # quantity_borrowed = models.IntegerField()
     #item_type = models.CharField(max_length=30,default='expensive')
-    STATUS_CHOICES = [('P', 'Pending'), ('C', 'Completed')]
+    weight = models.IntegerField(default= 0)
+    max_time = models.IntegerField(default=30)
+    STATUS_CHOICES = [('A', 'Available'), ('U', 'Unavailable')]
     component_status = models.CharField(max_length=1, choices=STATUS_CHOICES)
     amount_reserved_rn = models.IntegerField(default=0)
-
     amount_reserve = models.IntegerField()
-    percent_reserve = models.IntegerField()
-    max_time = models.IntegerField(default=30)
-    late_penalty = models.IntegerField(default= 100)
+    late_penalty = models.IntegerField(default=100)
     requires_admin_approval = models.BooleanField(default=False)
     change_hands_interval=models.IntegerField(default=7)
-    weight = models.IntegerField(default= 0)
     image = CloudinaryField('image', blank=True, null=True)  
 
     def __str__(self):
@@ -61,21 +55,21 @@ class ExpensiveItem(models.Model):
 class ExpensiveItemData(models.Model):
     #same item name as expensive_item
     item_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(CustomUser,on_delete=models.SET_NULL,null=True,blank=True,related_name="expensive_item_data_Users")
-    expensive_item = models.ForeignKey(ExpensiveItem, on_delete=models.CASCADE, null=False,      related_name="expensive_item_data_Expensive_items")
-    serial_id = models.CharField(max_length=100)
+    user = models.ForeignKey(CustomUser,on_delete=models.SET_NULL,null=True,blank=True, related_name="expensive_item_data_Users")
+    expensive_item = models.ForeignKey(ExpensiveItem, on_delete=models.CASCADE, null=False, related_name="expensive_item_data_Expensive_items")
+    serial_id = models.CharField(max_length=100, default = "Default Serial ID")
     stock = models.IntegerField(default=1)
-    STATUS_CHOICES = [('P', 'Pending'), ('C', 'Completed')]
+    STATUS_CHOICES = [('B', 'Borrowed'), ('A', 'Available')]
     item_status = models.CharField(max_length=1, choices=STATUS_CHOICES)
     weight = models.IntegerField(default= 0)
-    condition = models.TextField()
+    condition = models.TextField(default="This is an item's default condition")
     max_time = models.IntegerField(default=30)
     late_penalty = models.IntegerField(default= 100)
     requires_admin_approval = models.BooleanField(default=False)
-    change_hands_interval=models.IntegerField()
+    change_hands_interval=models.IntegerField(default=3)
     reserved = models.BooleanField(default=False)
     force_reserved = models.BooleanField(default=False)
-    image = CloudinaryField('image', blank=True, null=True)  
+    image = CloudinaryField('image', blank=True, null=True)
 
     def save(self, *args, **kwargs):
         self.student_id = f"{self.user.user_id}" 

@@ -222,7 +222,7 @@ IN_DOCKER = os.environ.get('IN_DOCKER', False)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_DB', 'se-locker'),
+        'NAME': os.environ.get('POSTGRES_DB', 'test3'),
         'USER': os.environ.get('POSTGRES_USER', 'postgres'),
         'PASSWORD': os.environ.get('POSTGRES_PASSWORD', '1212312121'),
         'HOST': os.environ.get('DB_HOST', 'db' if IN_DOCKER else 'localhost'),
