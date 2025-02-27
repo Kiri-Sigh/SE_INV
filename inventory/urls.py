@@ -41,9 +41,6 @@ urlpatterns = [
 
     #path('cart-items/<uuid:cart_id>/', CartItemsView.as_view(), name='cart-items'),
     #path('user-cart/<uuid:user_id>/', UserCartView.as_view(), name='user-cart')
-]
-
     path('cart-items/<uuid:cart_id>/', CartItemsView.as_view(), name='user-cart-view'),
     path('user-cart/<uuid:id>/',UserCartView.as_view(),name='user-cart-view')
 ]
-
