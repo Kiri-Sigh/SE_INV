@@ -17,7 +17,7 @@ class CheapItem(models.Model):
     weight = models.IntegerField(default=0)
     max_time = models.IntegerField(default=30)
     STATUS_CHOICES = [('A', 'Available'), ('U', 'Unavailable')]
-    component_status = models.CharField(max_length=1, choices=STATUS_CHOICES)
+    component_status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='A')
     amount_reserved_rn = models.IntegerField(default=0)
     amount_reserve = models.IntegerField()
     requires_admin_approval = models.BooleanField(default=False)
@@ -112,8 +112,9 @@ class BorrowItemList(models.Model):
     def __str__(self):
         if self.expensive_item_data:
             return self.expensive_item_data.expensive_item.name
-        else:
+        elif self.cheap_item:
             return self.cheap_item.name
+        return(str(self.borrow_id))
 
 
 

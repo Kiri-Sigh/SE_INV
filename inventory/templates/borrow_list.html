@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shopping Cart</title>
+    <title>Borrow List</title>
 </head>
 <body>
 
-    <h1>🛒 Your Cart</h1>
+    <h1>📋 Your Borrow List</h1>
 
-    {% if cart_items %}
+    {% if borrow_items %}
         <ul>
-            {% for item_data in cart_items %}
+            {% for item_data in borrow_items %}
                 <li>
                     <strong>
                         {% if item_data.cheap_item %}
@@ -25,18 +25,18 @@
                     Quantity: {{ item_data.quantity }}<br>
                     Start Date: {{ item_data.date_start }}<br>
                     End Date: {{ item_data.date_end }}<br>
-                    <a href="{% url 'remove_from_cart' item_data.user_cart_item_id %}">❌ Remove</a>
+                    <a href="{% url 'remove_from_borrow_list' booking_id=item_data.borrow_id  %}">❌ Remove</a>
                 </li>
                 <hr>
             {% endfor %}
         </ul>
     {% else %}
-        <p>Your cart is empty.</p>
+        <p>Your List is empty.</p>
     {% endif %}
 
     <hr>
 
-    <h2>Add Items to Cart</h2>
+    <h2>Add Items to List</h2>
 
     <form method="post">
         {% csrf_token %}
@@ -57,10 +57,10 @@
         <label for="end_date">End Date:</label>
         <input type="date" name="end_date" id="end_date" required>
 
-        <button type="submit">➕ Add to Cart</button>
+        <button type="submit">➕ Add to List</button>
     </form>
 
-    <a href="/">⬅ Back to Shop</a>
+    <a href="/">⬅ Back</a>
 
 </body>
 </html>

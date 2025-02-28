@@ -17,7 +17,7 @@ from .views import (
     ExpensiveItemListView,
     CheapItemPaginationListView,
     ExpensiveItemPaginationListView,
-    UserCartView,CartItemsView,
+    UserBorrowItemsView, BorrowItemsView,
     CombinedItemPaginationListView,
     CheapItemDetailView
 )
@@ -41,6 +41,11 @@ urlpatterns = [
 
     #path('cart-items/<uuid:cart_id>/', CartItemsView.as_view(), name='cart-items'),
     #path('user-cart/<uuid:user_id>/', UserCartView.as_view(), name='user-cart')
-    path('cart-items/<uuid:cart_id>/', CartItemsView.as_view(), name='user-cart-view'),
-    path('user-cart/<uuid:id>/',UserCartView.as_view(),name='user-cart-view')
+
+
+    # path('cart-items/<uuid:cart_id>/', CartItemsView.as_view(), name='user-cart-view'),
+    # path('user-cart/<uuid:id>/',UserCartView.as_view(),name='user-cart-view')
+
+    path('cart-items/<uuid:user_id>/', UserBorrowItemsView.as_view(), name='user-cart-items'),
+    path('user-borrowed-items/', BorrowItemsView.as_view(), name='user-borrowed-items')
 ]

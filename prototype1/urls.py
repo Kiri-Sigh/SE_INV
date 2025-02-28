@@ -22,7 +22,7 @@ from prototype1.views import home_view,home_view2,my_view
 from qr_app.views import generate_qr
 from prototype1.views import login_view
 from api.views import custom_logout
-from inventory.views import handler404, MainPage, cart_view, add_to_cart, remove_from_cart
+from inventory.views import handler404, MainPage, borrow_list_view, add_to_borrow_list, remove_from_borrow_list
 
 urlpatterns = [
     path('inventory/', include('inventory.urls')),  # app_name is already set in inventory/urls.py
@@ -39,9 +39,9 @@ urlpatterns = [
     path('auth/logout/', custom_logout, name="logout"),
     path('cmd_info/', my_view, name="cmd_info"),
     path('items/', MainPage.as_view()),
-    path("cart/", cart_view, name="cart_view"),
-    path("cart/add/<uuid:item_id>/", add_to_cart, name="add_to_cart"),
-    path("cart/remove/<uuid:booking_id>/", remove_from_cart, name="remove_from_cart"),
+    path("borrow-list/", borrow_list_view, name="borrow_list_view"),
+    path("borrow-list/add/<uuid:item_id>/", add_to_borrow_list, name="add_to_borrow_list"),
+    path("borrow-list/remove/<uuid:booking_id>/", remove_from_borrow_list, name="remove_from_borrow_list"),
 ]
 
 handler404 = handler404  # Register custom 404 handler

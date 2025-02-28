@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
 from django.urls import reverse
-from .models import ComponentCategory, CheapItem, ExpensiveItem, ExpensiveItemData, UserCart, UserCartItem
+from .models import ComponentCategory, CheapItem, ExpensiveItem, ExpensiveItemData
 from user.models import CustomUser
 from django.utils import timezone
 import uuid
@@ -62,45 +62,45 @@ class ExpensiveItemTests(TestCase):
         self.assertEqual(self.expensive_item.max_time, 30)  # Default value
         self.assertEqual(self.expensive_item.late_penalty, 100)  # Default value
 
-class UserCartTests(TestCase):
-    def setUp(self):
-        self.user = CustomUser.objects.create_user(
-            username="testuser",
-            password="testpass123",
-            email="test@example.com"
-        )
-        self.cart = UserCart.objects.create(user=self.user)
+# class UserCartTests(TestCase):
+#     def setUp(self):
+#         self.user = CustomUser.objects.create_user(
+#             username="testuser",
+#             password="testpass123",
+#             email="test@example.com"
+#         )
+#         self.cart = UserCart.objects.create(user=self.user)
         
-        # Create items for cart testing
-        self.category = ComponentCategory.objects.create(category="Electronics")
-        self.cheap_item = CheapItem.objects.create(
-            name="LED",
-            category=self.category,
-            stock=50,
-            description="LED light",
-            quantity_available=45,
-            quantity_borrowed=5,
-            weight=1,
-            amount_reserve=10,
-            percent_reserve=20
-        )
+#         # Create items for cart testing
+#         self.category = ComponentCategory.objects.create(category="Electronics")
+#         self.cheap_item = CheapItem.objects.create(
+#             name="LED",
+#             category=self.category,
+#             stock=50,
+#             description="LED light",
+#             quantity_available=45,
+#             quantity_borrowed=5,
+#             weight=1,
+#             amount_reserve=10,
+#             percent_reserve=20
+#         )
         
-        self.expensive_item = ExpensiveItem.objects.create(
-            name="Multimeter",
-            category=self.category,
-            stock=3,
-            description="Digital multimeter",
-            quantity_available=2,
-            quantity_borrowed=1,
-            component_status='P',
-            amount_reserve=1,
-            percent_reserve=20,
-            weight=2
-        )
+#         self.expensive_item = ExpensiveItem.objects.create(
+#             name="Multimeter",
+#             category=self.category,
+#             stock=3,
+#             description="Digital multimeter",
+#             quantity_available=2,
+#             quantity_borrowed=1,
+#             component_status='P',
+#             amount_reserve=1,
+#             percent_reserve=20,
+#             weight=2
+#         )
 
-    def test_cart_creation(self):
-        self.assertEqual(self.cart.user, self.user)
-        self.assertIsInstance(self.cart.cart_id, uuid.UUID)
+#     def test_cart_creation(self):
+#         self.assertEqual(self.cart.user, self.user)
+#         self.assertIsInstance(self.cart.cart_id, uuid.UUID)
 
 class ViewTests(TestCase):
     def setUp(self):
