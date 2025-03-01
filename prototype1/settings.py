@@ -89,7 +89,8 @@ MIDDLEWARE = [
 ]
 CSRF_TRUSTED_ORIGINS = [
     #"https://yourwebsite.com",
-    "http://localhost:8000"
+    "http://localhost:8000",
+    "https://inventory.oplor.me"
 ]
 ROOT_URLCONF = 'prototype1.urls'
 
