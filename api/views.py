@@ -42,8 +42,6 @@ def set_jwt_cookie(response, access_token, refresh_token=None):
 
 @login_required
 def issue_jwt_token(request):
-    print("ran issue_jwt_token")
-    print("request.user",request.user)
     user = request.user  # The authenticated user
     refresh = RefreshToken.for_user(user)  
 

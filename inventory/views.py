@@ -8,19 +8,19 @@ from django.utils.safestring import mark_safe
 from django.views import View
 from django.db import models
 from django.utils.dateparse import parse_date
-from inventory.models import CheapItem, ExpensiveItem
+from inventory.models import CheapItem, ExpensiveItem, ExpensiveItemData, BorrowItemList
 from user.utils import get_google_profile
 
 from django.contrib.auth.decorators import login_required
-from .serializers import CheapItemListSerializer, ExpensiveItemListSerializer,CombinedItemSerializer,CheapItemDetailSerializer,UserCartSerializer, UserCartItemSerializer
-from rest_framework.permissions import IsAuthenticated,AllowAny,DjangoModelPermissions
+from .serializers import CheapItemListSerializer, ExpensiveItemListSerializer, CombinedItemSerializer, CheapItemDetailSerializer
+from rest_framework.permissions import IsAuthenticated, AllowAny, DjangoModelPermissions
 from rest_framework.authentication import SessionAuthentication
 from rest_framework import mixins, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404
-from .models import CheapItem, ExpensiveItem,UserCart, UserCartItem
+from .models import CheapItem, ExpensiveItem, ExpensiveItemData, BorrowItemList
 from user.models import CustomUser
 
 from rest_framework.pagination import PageNumberPagination
@@ -110,8 +110,8 @@ class DetailPage(View):
         else:
             next_month_date = date(year, month + 1, 1)
         
-        # Query all cart items that overlap with the current month
-        cart_items = UserCartItem.objects.filter(
+        # Query all borrow items that overlap with the current month
+        borrow_items = BorrowItemList.objects.filter(
             # Find items of the current type
             models.Q(cheap_item=item) if isinstance(item, CheapItem) else models.Q(expensive_item_data__expensive_item=item),
             # That have a date range overlapping with this month
@@ -129,26 +129,26 @@ class DetailPage(View):
             day_availability[current_date] = total_stock
         
         # Subtract borrowed quantities for each day
-        for cart_item in cart_items:
+        for borrow_item in borrow_items:
             # Check if date_start is a datetime object, if so, convert to date
-            if hasattr(cart_item.date_start, 'date'):
-                start_date = max(cart_item.date_start.date(), first_day)
+            if hasattr(borrow_item.date_start, 'date'):
+                start_date = max(borrow_item.date_start.date(), first_day)
             else:
                 # Already a date object
-                start_date = max(cart_item.date_start, first_day)
+                start_date = max(borrow_item.date_start, first_day)
                 
             # Check if date_end is a datetime object, if so, convert to date
-            if hasattr(cart_item.date_end, 'date'):
-                end_date = min(cart_item.date_end.date(), next_month_date - timezone.timedelta(days=1))
+            if hasattr(borrow_item.date_end, 'date'):
+                end_date = min(borrow_item.date_end.date(), next_month_date - timezone.timedelta(days=1))
             else:
                 # Already a date object
-                end_date = min(cart_item.date_end, next_month_date - timezone.timedelta(days=1))
+                end_date = min(borrow_item.date_end, next_month_date - timezone.timedelta(days=1))
             
             # For each day in the booking range, decrease availability
             current = start_date
             while current <= end_date:
                 if current.month == month and current.year == year:
-                    day_availability[current] -= cart_item.quantity
+                    day_availability[current] -= borrow_item.quantity
                 current += timezone.timedelta(days=1)
         
         # Convert the calendar HTML to a modifiable format (with availability information)
@@ -214,6 +214,7 @@ class ExpensiveItemListView(mixins.ListModelMixin, generics.GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
+
 class CheapItemDetailView(generics.RetrieveAPIView):
     queryset = CheapItem.objects.all()
     serializer_class = CheapItemDetailSerializer
@@ -269,101 +270,100 @@ class CombinedItemPaginationListView(generics.GenericAPIView):
             "expensive_items": expensive_serialized
         })
 
-class UserCartView(APIView):
+class UserBorrowItemsView(APIView):
     def get(self, request, user_id):
         try:
-            # Ensure to prefetch related user cart items using the correct related_name
-            user_cart = UserCart.objects.filter(user_id=user_id).prefetch_related("user_cart_item_Exp_item_data")
+            # Get all borrow items for the user
+            borrow_items = BorrowItemList.objects.filter(user_id=user_id)
 
-            if not user_cart.exists():
-                return Response({"message": "No carts found for this user"}, status=status.HTTP_404_NOT_FOUND)
+            if not borrow_items.exists():
+                return Response({"message": "No borrowed items found for this user"}, status=status.HTTP_404_NOT_FOUND)
 
-            # Serialize the user cart data, including nested cart items
-            serializer = UserCartSerializer(user_cart, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            # You'll need to create a BorrowItemListSerializer
+            # For now, returning a basic response
+            result = []
+            for item in borrow_items:
+                item_data = {
+                    "borrow_id": item.borrow_id,
+                    "user": item.user.username,
+                    "quantity": item.quantity,
+                    "date_start": item.date_start,
+                    "date_end": item.date_end,
+                }
+                
+                if item.expensive_item_data:
+                    item_data["item_name"] = item.expensive_item_data.expensive_item.name
+                    item_data["item_type"] = "expensive"
+                elif item.cheap_item:
+                    item_data["item_name"] = item.cheap_item.name
+                    item_data["item_type"] = "cheap"
+                
+                result.append(item_data)
+                
+            return Response(result, status=status.HTTP_200_OK)
         
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-class CartItemsView(APIView):
+
+class BorrowItemsView(APIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]  # Only authenticated users can access this view
 
-    def get(self, request, cart_id):
-        print("running")
-
-        # Fetch the cart for the given cart_id
+    def get(self, request):
         try:
-            # Fetch the cart using the cart_id
-            cart = UserCart.objects.get(cart_id=cart_id)
+            # Fetch all borrowed items for the authenticated user
+            borrow_items = BorrowItemList.objects.filter(user=request.user)
+            
+            # You'll need to create a BorrowItemListSerializer
+            # For now, returning a basic response
+            result = []
+            for item in borrow_items:
+                item_data = {
+                    "borrow_id": item.borrow_id,
+                    "quantity": item.quantity,
+                    "date_start": item.date_start,
+                    "date_end": item.date_end,
+                }
+                
+                if item.expensive_item_data:
+                    item_data["item_name"] = item.expensive_item_data.expensive_item.name
+                    item_data["item_type"] = "expensive"
+                elif item.cheap_item:
+                    item_data["item_name"] = item.cheap_item.name
+                    item_data["item_type"] = "cheap"
+                
+                result.append(item_data)
+                
+            return Response(result, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-            # Compare the user_id from the CustomUser (FK) to the authenticated user ID
-            if str(cart.user.id) != str(request.user.id):
-                # If the IDs don't match, return a 403 Forbidden response
-                return Response({"detail": "You are not allowed to access this cart."}, status=status.HTTP_403_FORBIDDEN)
-
-            # Serialize the cart data
-            serializer = UserCartSerializer(cart)
-
-            # Return the serialized data
-            return Response(serializer.data)
-
-        except UserCart.DoesNotExist:
-            raise Http404
 from rest_framework.generics import ListAPIView
 
-class CheapItemListView(ListAPIView):
+class CheapItemAPIListView(ListAPIView):
     queryset = CheapItem.objects.all()
     serializer_class = CheapItemListSerializer
     permission_classes = [AllowAny]  # No authentication required
 
 # View for ExpensiveItem
-class ExpensiveItemListView(ListAPIView):
+class ExpensiveItemAPIListView(ListAPIView):
     queryset = ExpensiveItem.objects.all()
     serializer_class = ExpensiveItemListSerializer
     permission_classes = [AllowAny]  # No authentication required
 
-def get_cart_user(request):
-    """Returns the appropriate user for the cart: logged-in user or the superuser for guest users."""
+def borrow_list_view(request):
+    """Displays the borrow items and allows adding items with quantity and borrow dates."""
     if request.user.is_authenticated:
-        return request.user
+        user = request.user
+    else:
+        # Redirect to login if user is not authenticated
+        return redirect("login")  # Assuming you have a login URL name
+    print(f"displaying borrow list of user {user.username}, id: {user.user_id}")
     
-    # For guest users, get or create the guest/superuser
-    guest_user_id = "02982694-b38a-4adc-b014-0755af684d91"  # Superuser ID
-    
-    try:
-        # Try to get the existing superuser
-        guest_user = CustomUser.objects.get(user_id=guest_user_id)
-    except CustomUser.DoesNotExist:
-        # Create the superuser if it doesn't exist
-        guest_user = CustomUser.objects.create(
-            user_id=guest_user_id,
-            username="guest_cart_user",
-            email="guest@example.com",
-            is_superuser=True,
-            is_staff=True
-        )
-        guest_user.set_password(uuid.uuid4().hex)  # Set a random password
-        guest_user.save()
-        print(f"Created guest cart user with ID: {guest_user_id}")
-    
-    return guest_user
-
-def get_or_create_cart(user):
-    """Gets or creates a cart for the given user."""
-    cart, created = UserCart.objects.get_or_create(user=user)
-    return cart
-
-def cart_view(request):
-    """Displays the cart and allows adding items with quantity and borrow dates."""
-    # Debug information
-    print("req session", request.session.items())
-    print("req user", request.user)
-    
-    user = get_cart_user(request)
-    cart = get_or_create_cart(user)
-    
-    # Get all items in the user's cart
-    items = UserCartItem.objects.filter(user_cart=cart)
+    # Get all items in the user's borrow list
+    borrow_items = BorrowItemList.objects.filter(user=user)
+    print(borrow_items)
     all_items = list(CheapItem.objects.all()) + list(ExpensiveItem.objects.all())
     
     if request.method == "POST":
@@ -384,9 +384,9 @@ def cart_view(request):
                 end_date = parse_date(end_date)
 
                 if quantity > 0 and start_date and end_date and start_date < end_date:
-                    # Create a new cart item
-                    new_item = UserCartItem(
-                        user_cart=cart,
+                    # Create a new borrow item
+                    new_item = BorrowItemList(
+                        user=user,
                         quantity=quantity,
                         date_start=start_date,
                         date_end=end_date
@@ -395,67 +395,90 @@ def cart_view(request):
                     # Set the appropriate item type
                     if cheap_item:
                         new_item.cheap_item = cheap_item
+                        new_item.quantity_specified = False
                     else:
-                        # Fixed: using expensive_item instead of expensive_item_data
-                        new_item.expensive_item_data = None  # Ensure this is null
-                        # The model has expensive_item_data field, but we need to check the database
-                        # and see if we can find the item in the ExpensiveItemData table
+                        # For expensive items
                         expensive_item_data = None
-                        # If we can't find it, we'll create the cart item anyway
-                        new_item.cheap_item = None
+                        # Try to find an available ExpensiveItemData object
+                        available_data = ExpensiveItemData.objects.filter(
+                            expensive_item=expensive_item,
+                            item_status='A'  # Available status
+                        ).first()
+                        
+                        if available_data:
+                            expensive_item_data = available_data
+                        
                         new_item.expensive_item_data = expensive_item_data
+                        new_item.quantity_specified = True
                     
+                    new_item.date_specified = True
                     new_item.save()
-                    print(f"Added item to cart: {item_id} - {quantity} units from {start_date} to {end_date}")
+                    print(f"Added item to borrow list: {item_id} - {quantity} units from {start_date} to {end_date}")
             except (ValueError, TypeError) as e:
-                print(f"Error adding item to cart: {e}")
+                print(f"Error adding item to borrow list: {e}")
                 
-        return redirect("cart_view")
+        return redirect("borrow_list_view")
     
-    return render(request, "cart.html", {"cart_items": items, "all_items": all_items})
+    return render(request, "borrow_list.html", {"borrow_items": borrow_items, "all_items": all_items})
 
-def add_to_cart(request, item_id):
-    """Adds an item to the cart with default values."""
-    user = get_cart_user(request)
-    cart = get_or_create_cart(user)
+def add_to_borrow_list(request, item_id):
+    """Adds an item to the borrow list with default values."""
+    if not request.user.is_authenticated:
+        return redirect("login")  # Redirect to login if not authenticated
+    
+    user = request.user
     
     # Try to find the item
     cheap_item = CheapItem.objects.filter(component_id=item_id).first()
     expensive_item = ExpensiveItem.objects.filter(component_id=item_id).first()
     
     if cheap_item or expensive_item:
-        # Create a basic cart item with today's date and 7 days duration
+        # Create a basic borrow item with today's date and 7 days duration
         today = date.today()
         end_date = date.fromordinal(today.toordinal() + 7)  # 7 days later
         
-        cart_item = UserCartItem(
-            user_cart=cart,
+        borrow_item = BorrowItemList(
+            user=user,
             quantity=1,
             date_start=today,
-            date_end=end_date
+            date_end=end_date,
+            date_specified=True
         )
         
         # Set the appropriate item type
         if cheap_item:
-            cart_item.cheap_item = cheap_item
+            borrow_item.cheap_item = cheap_item
+            borrow_item.quantity_specified = False
         else:
-            # Since we have expensive_item_data in our model but want to use expensive_item
+            # For expensive items
             expensive_item_data = None
-            cart_item.expensive_item_data = expensive_item_data
+            # Try to find an available ExpensiveItemData object
+            available_data = ExpensiveItemData.objects.filter(
+                expensive_item=expensive_item,
+                item_status='A'  # Available status
+            ).first()
             
-        cart_item.save()
+            if available_data:
+                expensive_item_data = available_data
+            
+            borrow_item.expensive_item_data = expensive_item_data
+            borrow_item.quantity_specified = True
+            
+        borrow_item.save()
     
-    return redirect("cart_view")
+    return redirect("borrow_list_view")
 
-def remove_from_cart(request, booking_id):
-    """Removes a specific booking from the cart."""
-    user = get_cart_user(request)
-    cart = get_or_create_cart(user)
+def remove_from_borrow_list(request, booking_id):
+    """Removes a specific booking from the borrow list."""
+    if not request.user.is_authenticated:
+        return redirect("login")
     
-    # Delete the cart item if it exists and belongs to the user's cart
-    UserCartItem.objects.filter(
-        user_cart=cart, 
-        user_cart_item_id=booking_id
+    user = request.user
+    
+    # Delete the borrow item if it exists and belongs to the user
+    BorrowItemList.objects.filter(
+        user=user, 
+        borrow_id=booking_id
     ).delete()
     
-    return redirect("cart_view")
+    return redirect("borrow_list_view")

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 # from your_app.models import StudentUser
-from inventory.models import CheapItem,ExpensiveItem,ExpensiveItemData,ComponentCategory,UserCart,UserCartItem
+from inventory.models import CheapItem,ExpensiveItem,ExpensiveItemData,ComponentCategory
 from locker.models import Locker,LockerSet,LockerInteractionLog,ItemInOneLocker,RelItemInOneLocker
 from notification.models import NotifyUserCheapItem,NotifyUserExpensiveGroup,NotifyUserExpensiveItem,Reminder
 from session.models import Session,CheapItemSessionData,ExpensiveItemSessionData,CompletedRecord
@@ -30,6 +30,3 @@ admin.site.register(CheapItemSessionData)
 admin.site.register(ExpensiveItemSessionData)
 admin.site.register(CompletedRecord)
 admin.site.register(CustomUser)
-admin.site.register(UserCart)
-admin.site.register(UserCartItem)
-

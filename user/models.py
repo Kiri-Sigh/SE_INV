@@ -52,7 +52,7 @@ class CustomUser(AbstractUser):
     # image = CloudinaryField('image',blank=True, null=True)
 
     def __str__(self):
-        return self.user_id
+        return self.username
 # class UserKey(models.Model):
 #     user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 #     student_id = models.CharField(max_length=10)
