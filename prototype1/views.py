@@ -20,7 +20,9 @@ def my_view(request):
     return None
 
 def home_view(request):
-    return render(request, 'home/home.html')
+    print(request.path)
+    return redirect("/items")
+    #return render(request, 'home/home.html')
 
 def home_view2(request):
     my_view(request)

@@ -53,7 +53,8 @@ class MainPage(View):
             'query': query,
             'google_data': google_data
         }
-        
+        print("PATH",request.path)
+
         return render(request, self.template_name, context)
 
     def load_items(self):

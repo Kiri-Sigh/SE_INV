@@ -138,7 +138,7 @@ SOCIAL_AUTH_REQUIRE_POST = True
 
 LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
-LOGIN_REDIRECT_URL = '/api/token'
+LOGIN_REDIRECT_URL = '/' #'/api/token'
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
 SOCIAL_AUTH_JSONFIELD_CUSTOM = 'django.db.models.JSONField'
 SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = "http://127.0.0.1:8000/auth/complete/google-oauth2/"  # Change for production
@@ -171,7 +171,7 @@ SOCIAL_AUTH_PIPELINE = (
     #"social_core.pipeline.social_auth.associate_by_email",  # Optional: Match by email
     "social_core.pipeline.social_auth.auth_allowed",
     "social_core.pipeline.user.get_username",
-    #"user.pipeline.check_user_domain",  
+    "user.pipeline.check_user_domain",  
     "social_core.pipeline.user.create_user",
 
     #'user.pipeline.print_google_response',
@@ -223,9 +223,9 @@ IN_DOCKER = os.environ.get('IN_DOCKER', False)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_DB', 'se-locker'),
+        'NAME': os.environ.get('POSTGRES_DB', 'test3'),
         'USER': os.environ.get('POSTGRES_USER', 'postgres'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', '1212312121'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', '123'),
         'HOST': os.environ.get('DB_HOST', 'db' if IN_DOCKER else 'localhost'),
         'PORT': os.environ.get('POSTGRES_PORT', '5432'),
         'TEST': {
