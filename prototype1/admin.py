@@ -30,3 +30,9 @@
 # admin.site.register(ExpensiveItemSessionData)
 # admin.site.register(CompletedRecord)
 #admin.site.register(CustomUser)
+
+from django.contrib import admin
+from social_django.models import UserSocialAuth ,Association,Nonce
+admin.site.unregister(UserSocialAuth) 
+admin.site.unregister(Association) 
+admin.site.unregister(Nonce) 
