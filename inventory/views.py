@@ -214,18 +214,17 @@ class DetailPage(View):
     def post(self, request, item_id, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect("login")  # Redirect to login if not authenticated
-        
+
         item = CheapItem.objects.filter(component_id=item_id).first() or ExpensiveItem.objects.filter(component_id=item_id).first()
-        
+
         if not item:
             return render(request, '404.html', status=404)
-        
+
         # Get form data
         quantity = request.POST.get("quantity")
         start_date = request.POST.get("start_date")
         end_date = request.POST.get("end_date")
-        
-        # Process valid inputs
+
         if quantity and quantity.isdigit():
             try:
                 quantity = int(quantity)
@@ -233,80 +232,85 @@ class DetailPage(View):
                 end_date_obj = parse_date(end_date)
 
                 if quantity > 0 and start_date_obj and end_date_obj and start_date_obj < end_date_obj:
-                    # Check if borrowing this quantity would make availability negative on any day
                     available_stock = item.stock - item.amount_reserve
-                    
-                    # Get all existing bookings that overlap with the requested date range
+
                     overlapping_bookings = BorrowItemList.objects.filter(
                         models.Q(cheap_item=item) if isinstance(item, CheapItem) else models.Q(expensive_item_data__expensive_item=item),
                         models.Q(date_start__lte=end_date_obj) & models.Q(date_end__gte=start_date_obj)
                     )
-                    
-                    # Check availability for each day in the requested range
+
                     current_date = start_date_obj
                     can_borrow = True
-                    
+
                     while current_date <= end_date_obj:
-                        # Start with the available stock
                         daily_available = available_stock
-                        
-                        # Subtract quantities from existing bookings for this day
                         for booking in overlapping_bookings:
                             if booking.date_start <= current_date and booking.date_end >= current_date:
                                 daily_available -= booking.quantity
-                        
-                        # Now check if we can accommodate the new request
                         if daily_available - quantity < 0:
                             can_borrow = False
                             break
-                        
                         current_date += timezone.timedelta(days=1)
-                    
+
                     if can_borrow:
-                        # Create a new borrow item
+                        # Prepare the borrow item (not saved yet)
                         new_item = BorrowItemList(
                             user=request.user,
                             quantity=quantity,
                             date_start=start_date_obj,
                             date_end=end_date_obj
                         )
-                        
-                        # Set the appropriate item type
+
                         if isinstance(item, CheapItem):
                             new_item.cheap_item = item
                             new_item.quantity_specified = False
                         else:
-                            # For expensive items
-                            expensive_item_data = None
-                            # Try to find an available ExpensiveItemData object
                             available_data = ExpensiveItemData.objects.filter(
                                 expensive_item=item,
-                                item_status='A'  # Available status
+                                item_status='A'
                             ).first()
-                            
-                            if available_data:
-                                expensive_item_data = available_data
-                            
-                            new_item.expensive_item_data = expensive_item_data
+                            new_item.expensive_item_data = available_data
                             new_item.quantity_specified = True
-                        
+
                         new_item.date_specified = True
-                        new_item.save()
-                        print(f"Added item to borrow list: {item_id} - {quantity} units from {start_date_obj} to {end_date_obj}")
-                        
-                        # Redirect to borrow list view after successful addition
-                        return redirect("borrow_list_view")
+
+                        # Prepare API payload
+                        api_url = "http://152.42.220.156:8030/service_requests/new"
+                        api_payload = {
+                            "request_id": str(new_item.borrow_id),
+                            "organization_name": "SE_Locker",
+                            "organization_password": "1212312121",
+                            "use_dates": [start_date_obj.strftime("%Y-%m-%d")]
+                        }
+                        print(f"====================================== this is payload:\n{api_payload}")
+
+                        try:
+                            response = requests.post(api_url, json=api_payload)
+                            response.raise_for_status()
+                            print(f"External service response ({response.status_code}): {response.text}")
+
+                            # Save locally only if external API succeeded
+                            new_item.save()
+                            print(f"Added item to borrow list: {item_id} - {quantity} units from {start_date_obj} to {end_date_obj}")
+                            return redirect("borrow_list_view")
+
+                        except requests.RequestException as e:
+                            print(f"Failed to notify external service: {e}")
+                            response_content = getattr(e.response, 'text', 'No response') if hasattr(e, 'response') else 'No response'
+                            print(f"Response content: {response_content}")
+                            messages.error(request, f"Request failed: {response_content}")
+                            return self.get(request, item_id, *args, **kwargs)
+
                     else:
-                        # If borrowing would make availability negative, redirect back with an error
-                        # In a real application, you'd add an error message here
-                        print(f"Cannot borrow: Not enough availability for the requested dates")
+                        print("Not enough availability for the requested dates")
                         messages.error(request, "Not enough items left to borrow.")
-                        return self.get(request, item_id, *args, **kwargs)  
+                        return self.get(request, item_id, *args, **kwargs)
+
             except (ValueError, TypeError) as e:
                 print(f"Error adding item to borrow list: {e}")
-        
-        # If something went wrong, redirect back to the item detail page
-        return redirect("detail", item_id=item_id)
+
+        return redirect('borrow_list_view')
+
 
 
 # View for CheapItem
@@ -518,96 +522,43 @@ def borrow_list_view(request):
         'today': today
     })
 
-def add_to_borrow_list(request, item_id):
-    """Adds an item to the borrow list with default values and notifies external service."""
-    if not request.user.is_authenticated:
-        return redirect("login")  # Redirect to login if not authenticated
-    
-    user = request.user
-    today = date.today()
-    start_date = today
-    end_date = start_date + timezone.timedelta(days=6)  # Default borrow period = 1 week
-
-    # Try to find the item
-    cheap_item = CheapItem.objects.filter(component_id=item_id).first()
-    expensive_item = ExpensiveItem.objects.filter(component_id=item_id).first()
-
-    if cheap_item or expensive_item:
-        item = cheap_item or expensive_item
-        available_stock = item.stock - item.amount_reserve
-
-        overlapping_bookings = BorrowItemList.objects.filter(
-            models.Q(cheap_item=item) if isinstance(item, CheapItem) else models.Q(expensive_item_data__expensive_item=item),
-            models.Q(date_start__lte=end_date) & models.Q(date_end__gte=start_date)
-        )
-
-        current_date = start_date
-        can_borrow = True
-
-        while current_date <= end_date:
-            daily_available = available_stock
-            for booking in overlapping_bookings:
-                if booking.date_start <= current_date and booking.date_end >= current_date:
-                    daily_available -= booking.quantity
-
-            if daily_available - 1 < 0:
-                can_borrow = False
-                break
-
-            current_date += timezone.timedelta(days=1)
-
-        if can_borrow:
-            borrow_item = BorrowItemList(
-                user=user,
-                quantity=1,
-                date_start=start_date,
-                date_end=end_date,
-                date_specified=True
-            )
-
-            if cheap_item:
-                borrow_item.cheap_item = cheap_item
-                borrow_item.quantity_specified = False
-            else:
-                expensive_item_data = ExpensiveItemData.objects.filter(
-                    expensive_item=expensive_item,
-                    item_status='A'
-                ).first()
-
-                borrow_item.expensive_item_data = expensive_item_data
-                borrow_item.quantity_specified = True
-
-            borrow_item.save()
-
-            # Call external API to notify another server
-            api_url = "http://152.42.220.156:8030/service_requests/new"
-            api_payload = {
-                "request_id": borrow_item.id,  # Use the borrow item ID as request_id
-                "organization_name": "YourOrganization",
-                "organization_password": "YourSecretPassword",
-                "use_dates": [start_date.strftime("%Y-%m-%d")]
-            }
-
-            try:
-                response = requests.post(api_url, json=api_payload)
-                response.raise_for_status()  # Raises an error if response is unsuccessful
-            except requests.RequestException as e:
-                print(f"Failed to notify service: {e}")  # Log the error
-
-    return redirect("borrow_list_view")
-
 def remove_from_borrow_list(request, booking_id):
-    """Removes a specific booking from the borrow list."""
+    """Removes a specific booking from the borrow list and deletes the associated service request."""
     if not request.user.is_authenticated:
         return redirect("login")
-    
+
     user = request.user
-    
-    # Delete the borrow item if it exists and belongs to the user
-    BorrowItemList.objects.filter(
-        user=user, 
-        borrow_id=booking_id
-    ).delete()
+
+    # Try to find the booking before deleting
+    borrow_item = BorrowItemList.objects.filter(user=user, borrow_id=booking_id).first()
+
+    if borrow_item:
+        try:
+            # Step 1: Get service request info from external API
+            get_url = f"http://152.42.220.156:8030/service_requests/get/{borrow_item.borrow_id}/SE_Locker"
+            get_response = requests.get(get_url)
+            get_response.raise_for_status()
+
+            service_requests = get_response.json()
+            if service_requests:
+                service_request_id = service_requests[0].get("service_request_id")
+
+                if service_request_id is not None:
+                    # Step 2: Delete the service request from the external server
+                    delete_url = f"http://152.42.220.156:8030/service_requests/delete/{service_request_id}"
+                    delete_response = requests.delete(delete_url)
+                    delete_response.raise_for_status()
+                    print(f"Successfully deleted external service request: {service_request_id}")
+                    borrow_item.delete()
+                else:
+                    print("No service_request_id found in response.")
+            else:
+                print("No matching external service request found.")
+
+        except requests.RequestException as e:
+            print(f"Failed to delete external service request: {e}")
+        
+        # Delete from local database
     
     return redirect("borrow_list_view")
 
