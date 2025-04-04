@@ -598,7 +598,7 @@ def get_qr_code(request, booking_id):
             buffer = BytesIO()
             img.save(buffer, format="PNG")
             img_str = base64.b64encode(buffer.getvalue()).decode()
-            
+
             context = {
                 "qr_code": img_str,
                 "booking": booking,
