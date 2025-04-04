@@ -28,35 +28,35 @@ class CheapItemAdmin(admin.ModelAdmin):
     )
 
 
-@admin.register(ExpensiveItem)
-class ExpensiveItemAdmin(admin.ModelAdmin):
-    list_display = ('component_id', 'name', 'category', 'component_status', 'requires_admin_approval', 'late_penalty')
-    list_filter = ('category', 'component_status', 'requires_admin_approval')
-    search_fields = ('name', 'description')
-    ordering = ('name',)
-    readonly_fields = ('component_id', 'image')
-    fieldsets = (
-        ('Basic Info', {'fields': ('name', 'category', 'description', 'image')}),
-        ('Stock & Availability', {'fields': ('component_status', 'amount_reserved_rn', 'amount_reserve')}),
-        ('Time & Weight', {'fields': ('max_time', 'weight', 'change_hands_interval')}),
-        ('Penalty & Permissions', {'fields': ('late_penalty', 'requires_admin_approval')}),
-    )
+# @admin.register(ExpensiveItem)
+# class ExpensiveItemAdmin(admin.ModelAdmin):
+#     list_display = ('component_id', 'name', 'category', 'component_status', 'requires_admin_approval', 'late_penalty')
+#     list_filter = ('category', 'component_status', 'requires_admin_approval')
+#     search_fields = ('name', 'description')
+#     ordering = ('name',)
+#     readonly_fields = ('component_id', 'image')
+#     fieldsets = (
+#         ('Basic Info', {'fields': ('name', 'category', 'description', 'image')}),
+#         ('Stock & Availability', {'fields': ('component_status', 'amount_reserved_rn', 'amount_reserve')}),
+#         ('Time & Weight', {'fields': ('max_time', 'weight', 'change_hands_interval')}),
+#         ('Penalty & Permissions', {'fields': ('late_penalty', 'requires_admin_approval')}),
+#     )
 
 
-@admin.register(ExpensiveItemData)
-class ExpensiveItemDataAdmin(admin.ModelAdmin):
-    list_display = ('item_id', 'expensive_item', 'user', 'serial_id', 'stock', 'item_status', 'reserved', 'force_reserved')
-    list_filter = ('item_status', 'reserved', 'force_reserved')
-    search_fields = ('serial_id', 'expensive_item__name', 'user__username')
-    ordering = ('serial_id',)
-    readonly_fields = ('item_id', 'image')
-    fieldsets = (
-        ('Item Details', {'fields': ('expensive_item', 'serial_id', 'image')}),
-        ('User & Status', {'fields': ('user', 'item_status', 'reserved', 'force_reserved')}),
-        ('Stock & Condition', {'fields': ('stock', 'weight', 'condition')}),
-        ('Time & Penalty', {'fields': ('max_time', 'late_penalty', 'change_hands_interval')}),
-        ('Approval', {'fields': ('requires_admin_approval',)}),
-    )
+# @admin.register(ExpensiveItemData)
+# class ExpensiveItemDataAdmin(admin.ModelAdmin):
+#     list_display = ('item_id', 'expensive_item', 'user', 'serial_id', 'stock', 'item_status', 'reserved', 'force_reserved')
+#     list_filter = ('item_status', 'reserved', 'force_reserved')
+#     search_fields = ('serial_id', 'expensive_item__name', 'user__username')
+#     ordering = ('serial_id',)
+#     readonly_fields = ('item_id', 'image')
+#     fieldsets = (
+#         ('Item Details', {'fields': ('expensive_item', 'serial_id', 'image')}),
+#         ('User & Status', {'fields': ('user', 'item_status', 'reserved', 'force_reserved')}),
+#         ('Stock & Condition', {'fields': ('stock', 'weight', 'condition')}),
+#         ('Time & Penalty', {'fields': ('max_time', 'late_penalty', 'change_hands_interval')}),
+#         ('Approval', {'fields': ('requires_admin_approval',)}),
+#     )
 
 
 # @admin.register(BorrowItemList)
