@@ -29,6 +29,9 @@
             margin: 20px auto;
             border-radius: 5px;
         }
+        .qr-img {
+            width: 100%;;
+        }
         .item-details {
             margin-bottom: 20px;
             text-align: left;
@@ -57,13 +60,9 @@
             </div>
             
             <div class="qr-code">
-                <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code">
+                <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code" class="qr-img">
             </div>
-            
-            <div class="instructions">
-                <p>Please show this QR code at the pickup location to retrieve your item(s).</p>
-            </div>
-            
+
             <a href="{% url 'borrow_list_view' %}" class="btn btn-primary btn-back">Back to Borrow List</a>
         </div>
     </div>
