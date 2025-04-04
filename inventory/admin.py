@@ -2,6 +2,7 @@ from django.contrib import admin
 from .models import (
     ComponentCategory, CheapItem, ExpensiveItem, ExpensiveItemData, BorrowItemList
 )
+from django.utils.timezone import now
 
 @admin.register(ComponentCategory)
 class ComponentCategoryAdmin(admin.ModelAdmin):
@@ -56,15 +57,39 @@ class ExpensiveItemDataAdmin(admin.ModelAdmin):
     )
 
 
+# @admin.register(BorrowItemList)
+# class BorrowItemListAdmin(admin.ModelAdmin):
+#     list_display = ('borrow_id', 'user', 'expensive_item_data', 'cheap_item', 'quantity_specified', 'date_start', 'date_end')
+#     list_filter = ('quantity_specified', 'date_specified')
+#     search_fields = ('user__username', 'expensive_item_data__serial_id', 'cheap_item__name')
+#     ordering = ('date_start',)
+
+#     fieldsets = (
+#         ('Item in Locker Ready', {'fields': ('item_in_locker_done',)}),
+#         ('Item Returned', {'fields': ('item_returned',)}),
+#         ('Borrower Details', {'fields': ('user',)}),
+#         ('Items Borrowed', {'fields': ('expensive_item_data', 'cheap_item')}), 
+#         ('Quantity & Date', {'fields': ('quantity_specified', 'quantity', 'date_specified', 'date_start', 'date_end')}), 
+#     )
+
 @admin.register(BorrowItemList)
-class BorrowItemListAdmin(admin.ModelAdmin):
+
+class CurrentBorrowItemToInteractList(admin.ModelAdmin):
     list_display = ('borrow_id', 'user', 'expensive_item_data', 'cheap_item', 'quantity_specified', 'date_start', 'date_end')
     list_filter = ('quantity_specified', 'date_specified')
     search_fields = ('user__username', 'expensive_item_data__serial_id', 'cheap_item__name')
     ordering = ('date_start',)
-    fieldsets = (#('item in locker ready',{'fields': ('item_in_locker_done',)})
-                 #,('item returned',{'fields':('item_returned')}),
+
+    fieldsets = (
+        ('Item in Locker Ready', {'fields': ('item_in_locker_done',)}),
+        ('Item Returned', {'fields': ('item_returned',)}),
         ('Borrower Details', {'fields': ('user',)}),
-        ('Items Borrowed', {'fields': ('expensive_item_data', 'cheap_item')}),
-        ('Quantity & Date', {'fields': ('quantity_specified', 'quantity', 'date_specified', 'date_start', 'date_end')}),
+        ('Items Borrowed', {'fields': ('expensive_item_data', 'cheap_item')}), 
+        ('Quantity & Date', {'fields': ('quantity_specified', 'quantity', 'date_specified', 'date_start', 'date_end')}), 
     )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(date_start__gte=now())
+
+#admin.site.register(BorrowItemList, CurrentBorrowItemToInteractList)
