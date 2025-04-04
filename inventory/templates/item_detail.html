@@ -4,31 +4,161 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ item.name }} Details</title>
+    <link
+        rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
     <style>
         body {
             background-color: rgb(0, 0, 0);
             color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .detail {
+            flex: 1;
+            min-width: 300px;
+            background-color: #222;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        
+        .calcontainer {
+            flex: 2;
+            min-width: 300px;
+        }
+        
+        button {
+            padding: 8px 15px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        
+        .borrow-form {
+            background-color: #222;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        
+        .borrow-form h2 {
+            margin-top: 0;
+            color: skyblue;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            background-color: #333;
+            color: white;
+        }
+        
+        .submit-btn {
+            background-color: skyblue;
+            color: #222;
+            font-weight: bold;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .detail, .calcontainer {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-    <a href="/items">
-        <button style="margin-bottom: 20px; background-color: skyblue;">Item List</button>
-    </a>
-    <h1>{{ item.name }}</h1>
-    <p><strong>Category:</strong> {{ item.category }}</p>
-    <p><strong>Description:</strong> {{ item.description }}</p>
-    <p><strong>Stock:</strong> {{ item.stock }}</p>
-    <p><strong>Available:</strong> {{ item.quantity_available }}</p>
-    <p><strong>Borrowed:</strong> {{ item.quantity_borrowed }}</p>
-    
-    {% if item.image %}
-        <img src="{{ item.image.url }}" alt="{{ item.name }}" width="200">
-    {% endif %}
-
-    <br><br>
-
-    {% include 'calendar.html' %}
+    {% include 'navbar2.html' %}
+    <div class="container">
+        <div class="detail">
+            <a href="/items">
+                <button style="margin-bottom: 20px; background-color: skyblue; color: black">Item List</button>
+            </a>
+            <h1>{{ item.name }}</h1>
+            <p><strong>Category:</strong> {{ item.category }}</p>
+            <p><strong>Description:</strong> {{ item.description }}</p>
+            <p><strong>Stock:</strong> {{ item.stock }}</p>
+           
+            {% if item.image %}
+                <img src="{{ item.image.url }}" alt="{{ item.name }}" width="200">
+            {% endif %}
+            
+            <!-- Borrow form directly handled by the DetailPage view -->
+            <div class="borrow-form">
+                <h2>Borrow This Item</h2>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="quantity">Quantity:</label>
+                        <input type="number" name="quantity" id="quantity" min="1" max="{{ item.stock }}" value="1" required />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="start_date">Start Date:</label>
+                        <input type="date" name="start_date" id="start_date" value="{{ default_start_date|date:'Y-m-d' }}" required />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="end_date">End Date:</label>
+                        <input type="date" name="end_date" id="end_date" value="{{ default_end_date|date:'Y-m-d' }}" required />
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">➕ Add to Borrow List</button>
+                </form>
+            </div>
+        </div>
+        <div class="calcontainer">
+            {% include 'calendar.html' %}
+        </div>
+    </div>
 </body>
+{% if messages %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            {% for message in messages %}
+                alert("{{ message }}");  // Show popup
+            {% endfor %}
+        });
+    </script>
+{% endif %}
 </html>
-
