@@ -101,8 +101,8 @@ class BorrowItemList(models.Model):
     quantity = models.IntegerField(default=1)
     date_start = models.DateField()
     date_end = models.DateField()
-    item_returned = models.BooleanField(default=False)
-    item_in_locker_done = models.BooleanField(default=False)
+    # item_returned = models.BooleanField(default=False)
+    # item_in_locker_done = models.BooleanField(default=False)
     def save(self, *args, **kwargs):
         if self.expensive_item_data:
             self.quantity_specified = True
