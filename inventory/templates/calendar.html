@@ -1,7 +1,6 @@
 <div class="calendar-container">
     <div class="calendar-nav">
         <a href="?year={{ prev_year }}&month={{ prev_month }}" class="calendar-nav-btn">Previous</a>
-        <h2 class="calendar-title">{{ month_name }} {{ year }}</h2>
         <a href="?year={{ next_year }}&month={{ next_month }}" class="calendar-nav-btn">Next</a>
     </div>
     <div class="calendar">
@@ -9,90 +8,118 @@
     </div>
     <div class="calendar-legend">
         <div class="legend-item">
-            <span class="color-box" style="background-color: #ffaaaa;"></span>
+            <span class="color-box no-availability"></span>
             <span>No items available</span>
         </div>
         <div class="legend-item">
-            <span class="color-box" style="background-color: #ffddaa;"></span>
-            <span>Low availability (less than 30%)</span>
+            <span class="color-box low-availability"></span>
+            <span>Low availability</span>
         </div>
         <div class="legend-item">
-            <span class="color-box" style="background-color: white;"></span>
+            <span class="color-box"></span>
             <span>Available</span>
         </div>
     </div>
 </div>
-
 <style>
     .calendar-container {
-        margin: 20px 0;
+        margin: 0;
         padding: 15px;
-        background-color: #333;
+        background-color: #222;
         border-radius: 5px;
     }
-    
+   
     .calendar-nav {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 15px;
     }
-    
+   
     .calendar-nav-btn {
         background-color: skyblue;
         color: black;
         padding: 5px 10px;
         text-decoration: none;
         border-radius: 3px;
+        font-weight: bold;
     }
-    
+   
     .calendar {
         background-color: #444;
         padding: 10px;
         border-radius: 3px;
+        overflow-x: auto;
     }
-    
-    .calendar table {
+   
+    .calendar-table {
         width: 100%;
         border-collapse: collapse;
+        table-layout: fixed;
     }
-    
-    .calendar th {
+   
+    .calendar-table th {
         background-color: #555;
         color: white;
         padding: 8px;
         text-align: center;
     }
-    
-    .calendar td {
+   
+    .calendar-table td {
         padding: 8px;
         text-align: center;
         border: 1px solid #666;
+        height: 40px;
+        vertical-align: top;
     }
-    
+   
     .availability {
         display: block;
         font-size: 0.8em;
-        color: #aaa;
+        color: #ddd;
+        margin-top: 4px;
     }
-    
+   
     .calendar-legend {
         margin-top: 15px;
         display: flex;
+        flex-wrap: wrap;
         justify-content: center;
         gap: 20px;
     }
-    
+   
     .legend-item {
         display: flex;
         align-items: center;
         gap: 5px;
     }
-    
+   
     .color-box {
         display: inline-block;
         width: 15px;
         height: 15px;
         border: 1px solid #666;
+        background-color: white;
+    }
+    
+    .no-availability {
+        background-color: #ff7d7d;
+    }
+    
+    .low-availability {
+        background-color: #ffb342;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .calendar-table {
+            min-width: 500px;
+        }
+        
+        .calendar-legend {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
     }
 </style>

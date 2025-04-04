@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code for Item Pickup</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: black;
+            color: white;
+        }
+        .qr-container {
+            text-align: center;
+            margin: 30px auto;
+            max-width: 500px;
+            background-color: #222;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .qr-code {
+            background-color: white;
+            padding: 15px;
+            display: inline-block;
+            margin: 20px auto;
+            border-radius: 5px;
+        }
+        .item-details {
+            margin-bottom: 20px;
+            text-align: left;
+            padding: 10px;
+            background-color: #333;
+            border-radius: 5px;
+        }
+        .btn-back {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    {% include 'navbar2.html' %}
+
+    <div class="container">
+        <div class="qr-container">
+            <h2>Your QR Code for Pickup</h2>
+            
+            <div class="item-details">
+                <h4>Item Details:</h4>
+                <p><strong>Item:</strong> {{ item_name }}</p>
+                <p><strong>Quantity:</strong> {{ booking.quantity }}</p>
+                <p><strong>Start Date:</strong> {{ booking.date_start }}</p>
+                <p><strong>End Date:</strong> {{ booking.date_end }}</p>
+            </div>
+            
+            <div class="qr-code">
+                <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code">
+            </div>
+            
+            <div class="instructions">
+                <p>Please show this QR code at the pickup location to retrieve your item(s).</p>
+            </div>
+            
+            <a href="{% url 'borrow_list_view' %}" class="btn btn-primary btn-back">Back to Borrow List</a>
+        </div>
+    </div>
+</body>
+</html>

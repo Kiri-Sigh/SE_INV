@@ -33,6 +33,7 @@ def generate_qr(request):
 
         # Encrypt the JSON data
         encrypted_data = cipher.encrypt(json_data)
+        # encrypted_data = qr_str
 
         # Generate QR code
         qr = qrcode.QRCode(version=1, box_size=10, border=5)

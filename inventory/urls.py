@@ -47,5 +47,5 @@ urlpatterns = [
     # path('user-cart/<uuid:id>/',UserCartView.as_view(),name='user-cart-view')
 
     path('cart-items/<uuid:user_id>/', UserBorrowItemsView.as_view(), name='user-cart-items'),
-    path('user-borrowed-items/', BorrowItemsView.as_view(), name='user-borrowed-items')
+    path('user-borrowed-items/', BorrowItemsView.as_view(), name='user-borrowed-items'),
 ]
