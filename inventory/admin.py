@@ -17,12 +17,14 @@ class CheapItemAdmin(admin.ModelAdmin):
     list_filter = ('category', 'component_status', 'requires_admin_approval')
     search_fields = ('name', 'description')
     ordering = ('name',)
-    readonly_fields = ('component_id', 'image')
+    readonly_fields = ('component_id', )
     fieldsets = (
         ('Basic Info', {'fields': ('name', 'category', 'description', 'image')}),
         ('Stock & Availability', {'fields': ('stock', 'component_status', 'amount_reserved_rn', 'amount_reserve')}),
         ('Time & Weight', {'fields': ('max_time', 'weight')}),
-        ('Permissions', {'fields': ('requires_admin_approval',)})
+        ('Permissions', {'fields': ('requires_admin_approval',)}),
+        #('Image', {'fields': ('image',)})
+        
     )
 
 
