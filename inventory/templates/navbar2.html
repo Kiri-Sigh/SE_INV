@@ -15,16 +15,17 @@
               <li><a href="#">Page 1-3</a></li>
             </ul>
           </li> -->
-      <li><a href="{% url 'admin:index' %}">ADMIN</a></li>
-      <li><a href="{% url 'qr-request' %}">QR</a></li>
-      <li><a href="/items">ITEM LIST</a></li>
-      <li><a href="/borrow-list">BORROW LIST</a></li>
+          <li><a href="/borrow-list">My Borrow List</a></li>
+          {% if user.is_staff %}
+            <li><a href="{% url 'todays_requests' %}">Today's Requests</a></li>
+            <li><a href="{% url 'admin:index' %}">Admin</a></li>
+          {% endif %}
     </ul>
     {% if user.is_authenticated %}
 
     <ul class="nav navbar-nav navbar-right">
       <li>
-        <a href="/social-profile"
+        <a href="/auth/logout"
           ><span class="glyphicon glyphicon-user"></span> {{user.username}}</a
         >
       </li>

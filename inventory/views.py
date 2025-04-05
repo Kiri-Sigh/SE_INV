@@ -614,3 +614,15 @@ def get_qr_code(request, booking_id):
     except Exception as e:
         # Handle other errors
         return render(request, "error.html", {"message": f"Error generating QR code: {str(e)}"})
+    
+def todays_requests_view(request):
+    if not request.user.is_authenticated or not request.user.is_staff:
+        return redirect("login")
+    
+    today = date.today()
+    todays_items = BorrowItemList.objects.filter(date_start=today)
+    
+    return render(request, 'todays_requests.html', {
+        'todays_items': todays_items,
+        'today': today
+    })

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Borrow List</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        background-color: black;
+        color: white;
+      }
+      .section-header {
+        margin-top: 30px;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #444;
+      }
+      .item-card {
+        background-color: #222;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 15px;
+      }
+      .empty-message {
+        font-style: italic;
+        color: #aaa;
+        margin: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    {% include 'navbar2.html' %}
+
+    <h2 class="section-header">📌 Today's Requests</h2>
+    {% if todays_items %}
+      {% for item_data in todays_items %}
+        <div class="item-card">
+          <strong>
+            {% if item_data.cheap_item %}
+              {{ item_data.cheap_item.name }}
+            {% elif item_data.expensive_item_data %}
+              {{ item_data.expensive_item_data.expensive_item.name }}
+            {% else %}
+              Unknown Item
+            {% endif %}
+          </strong><br/>
+          Quantity: {{ item_data.quantity }}<br />
+          Start Date: {{ item_data.date_start }}<br />
+          End Date: {{ item_data.date_end }}<br />
+          <a href="{% url 'get_qr_code' booking_id=item_data.borrow_id %}" class="btn btn-success btn-sm">Get QR</a>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="empty-message">No items requested today.</p>
+    {% endif %}
+  </body>
+</html>
